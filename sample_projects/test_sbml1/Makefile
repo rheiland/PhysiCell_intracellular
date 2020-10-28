@@ -94,8 +94,11 @@ PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
+# PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
+SBML_OBJECTS := librr_intracellular.o 
+
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(SBML_OBJECTS)
 
 # compile the project 
 
@@ -198,23 +201,9 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 custom.o: ./custom_modules/custom.cpp ./intracellular/PhysiCell_intracellular.h
 	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
-submodel_data_structures.o: ./custom_modules/submodel_data_structures.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/submodel_data_structures.cpp
+librr_intracellular.o: ./addons/libRoadrunner/src/librr_intracellular.cpp ./addons/libRoadrunner/src/librr_intracellular.h
+	$(COMPILE_COMMAND) -c ./addons/libRoadrunner/src/librr_intracellular.cpp
 
-internal_viral_dynamics.o: ./custom_modules/internal_viral_dynamics.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/internal_viral_dynamics.cpp
-
-internal_viral_response.o: ./custom_modules/internal_viral_response.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/internal_viral_response.cpp
-
-receptor_dynamics.o: ./custom_modules/receptor_dynamics.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/receptor_dynamics.cpp
-	
-immune_submodels.o: ./custom_modules/immune_submodels.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/immune_submodels.cpp 
-	
-epithelium_submodel.o: ./custom_modules/epithelium_submodel.cpp
-	$(COMPILE_COMMAND) -c ./custom_modules/epithelium_submodel.cpp 
 
 # cleanup
 	
