@@ -9,14 +9,14 @@
 #include "../../../modules/PhysiCell_pugixml.h"
 // #include "maboss_network.h"
 
-#ifdef ADDON_SBML
+// #ifdef ADDON_SBML
 // These are for C
 // #define STATIC_RRC
 #include "rrc_api.h"
 #include "rrc_types.h"
 // #include "rrc_utilities.h"
 extern "C" rrc::RRHandle createRRInstance();
-#endif // 
+// #endif
 
 class SBMLIntracellular : public PhysiCell::Intracellular {
  private:
@@ -24,8 +24,6 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
 	
 	static long counter;
 	
-	// std::string bnd_filename;
-	// std::string cfg_filename;
 	std::string sbml_filename;
 	
 	double time_step = 12;
@@ -34,16 +32,13 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
 	double scaling = 1.0;
 	
 	std::map<std::string, double> initial_values;
-	// std::map<std::string, double> mutations;
 	std::map<std::string, double> parameters;
 	
-	// MaBoSSNetwork maboss;
     rrc::RRHandle rrHandle = createRRInstance();
     // rrc::RRHandle rrHandle;
     // rrc::RRVectorPtr vptr;
 	rrc::RRCDataPtr result;  // start time, end time, and number of points
 
-	// double next_physiboss_run = 0;
 	double next_librr_run = 0;
 
     SBMLIntracellular();

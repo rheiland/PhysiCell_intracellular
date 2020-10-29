@@ -83,6 +83,13 @@ void SBMLIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 	// 		node_mutation = node_mutation.next_sibling( "mutation" ); 
 	// 	}
 	// }
+
+	pugi::xml_node node_sbml = node.child( "sbml_filename" );
+	if ( node_sbml )
+	{ 
+        sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
+        std::cout << __FILE__ << ", " << __FUNCTION__ << ": ------- sbml_filename = " << sbml_filename << std::endl;
+    }
 	
 	pugi::xml_node node_parameters = node.child( "parameters" );
 	if( node_parameters )
@@ -109,23 +116,6 @@ void SBMLIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 	// { 
 	// 	time_step = PhysiCell::xml_get_my_double_value( node_timestep );
 	// 	maboss.set_update_time_step(time_step);
-	// }
-	
-	// pugi::xml_node node_discretetime = node.child( "discrete_time" ); 
-	// pugi::xml_node node_timetick = node.child( "time_tick" ); 
-
-	// if( node_discretetime && node_timetick )
-	// { 
-	// 	discrete_time = PhysiCell::xml_get_my_bool_value( node_discretetime );		
-	// 	time_tick = PhysiCell::xml_get_my_double_value( node_timetick );
-	// 	maboss.set_discrete_time(discrete_time, time_tick);
-	// }
-
-	// pugi::xml_node node_scaling = node.child( "scaling" ); 
-	// if( node_scaling )
-	// { 
-	// 	scaling = PhysiCell::xml_get_my_double_value( node_scaling );
-	// 	maboss.set_scaling(scaling);
 	// }
 }
 

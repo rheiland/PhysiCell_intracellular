@@ -85,23 +85,29 @@ void create_cell_types( void )
 	   This is a good place to set default functions. 
 	*/ 
 	
+    std::cout << "custom.cpp: 1" << std::endl;
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
 	cell_defaults.functions.update_velocity = NULL;
 
+    std::cout << "custom.cpp: 2" << std::endl;
 	cell_defaults.functions.update_migration_bias = NULL; 
 	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; // update_cell_and_death_parameters_O2_based; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
+    std::cout << "custom.cpp: 3" << std::endl;
 	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
 	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
-	cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
+    std::cout << "custom.cpp: 4" << std::endl;
+	// cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
 
 	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
 	
+    std::cout << "custom.cpp: before initialize_cell_definitions_from_pugixml() " << std::endl;
 	initialize_cell_definitions_from_pugixml(); 
+    std::cout << "custom.cpp: after initialize_cell_definitions_from_pugixml() " << std::endl;
 	
 	/* 
 	   Put any modifications to individual cell definitions here. 
@@ -114,8 +120,10 @@ void create_cell_types( void )
 	*/
 
 	build_cell_definitions_maps(); 
+    std::cout << "custom.cpp: after build_cell_definitions_maps() " << std::endl;
 	
 	display_cell_definitions( std::cout ); 
+    std::cout << "custom.cpp: after display_cell_definitions() " << std::endl;
 	
 	return; 
 }
@@ -136,83 +144,103 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
-	Cell* pC;
+    // place a cluster of tumor cells at the center 
 	
-	// We have four different cells populations
-	// All start with A active and C inactive, B is random
-	// We print the value of C
+	double cell_radius = cell_defaults.phenotype.geometry.radius; 
+	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	for (int i=0; i < 90; i+= 10)
-		for (int j=0; j < 90; j+= 10){
-			
-			// bottom left : default
-			// the formula for C is A&B. Meaning that C will only activate for half the cells
-			pC = create_cell(get_cell_definition("default")); 
-			pC->assign_position(-i-10, -j-10, 0.0 );
-			
-			// bottom middle : other
-			// the formula for C is A|B. C will activate in all cells
-			pC = create_cell(get_cell_definition("other")); 
-			pC->assign_position(i+10, -j-10, 0.0 );
-
-			// top left : another
-			// Here we mutate the C node at zero, so it will stay there
-			pC = create_cell(get_cell_definition("another")); 
-			pC->assign_position(-i-10, j+10, 0.0 );
-			
-			// top middle : yet_another
-			// Here we change the default value for the rates, acelerating the activation of C
-			pC = create_cell(get_cell_definition("yet_another")); 
-			pC->assign_position(i+10, j+10, 0.0 );
-			
-			// top right : yet_yet_another
-			// Here we acelerate the activation of C by changing the scaling value
-			pC = create_cell(get_cell_definition("yet_yet_another")); 
-			pC->assign_position(i+110, j+10, 0.0 );
-			
-			// bottom right : last_one
-			// Here we start with $time_scale = 0, then at the middle of the simulation we set it to 0.1
-			pC = create_cell(get_cell_definition("last_one")); 
-			pC->assign_position(i+110, -j-10, 0.0 );
-		}
-
+	double tumor_radius = parameters.doubles("tumor_radius"); // 200.0; 
+	
+	Cell* pCell = NULL; 
+	
+	double x = 0.0; 
+	double x_outer = tumor_radius; 
+	double y = 0.0; 
+	
+	int n = 0; 
+	// while( y < tumor_radius )  // to just create cells at y=0
+	cell_spacing *= 4;   // spread them out
+	{
+		x = 0.0; 
+		if( n % 2 == 1 )
+		{ x = 0.5*cell_spacing; }
+		x_outer = sqrt( tumor_radius*tumor_radius - y*y ); 
 		
+		while( x < x_outer )
+		{
+			pCell = create_cell(); // tumor cell 
+			pCell->assign_position( x , y , 0.0 );
+			
+			// if( fabs( y ) > 0.01 )
+			// {
+			// 	pCell = create_cell(); // tumor cell 
+			// 	pCell->assign_position( x , -y , 0.0 );				
+			// }
+			
+			if( fabs( x ) > 0.01 )
+			{ 
+				pCell = create_cell(); // tumor cell 
+				pCell->assign_position( -x , y , 0.0 );
+
+                // SBMLIntracellular* mysbml =  getSBMLModel(pCell->phenotype);
+
+                // std::cout << "-- create_cell: sbml file= "<< pCell->phenotype.intracellular->sbml_filename << std::endl;
+
+                // rrc::RRHandle rrHandle = createRRInstance();
+                // pC->phenotype.molecular.model_rr = rrHandle;  // assign the intracellular model to each cell
+                // int r = rrc::getNumberOfReactions(rrHandle);
+				
+				// if( fabs( y ) > 0.01 )
+				// {
+				// 	pCell = create_cell(); // tumor cell 
+				// 	pCell->assign_position( -x , -y , 0.0 );
+				// }
+			}
+			x += cell_spacing; 
+			
+		}
+		
+		y += cell_spacing * sqrt(3.0)/2.0; 
+		n++; 
+	}
+	
 	return; 
 }
 
-
+// This may need to be done more frequently than dt_phenotype; may need to put in main.cpp
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	
-	if (pCell->phenotype.intracellular->need_update())
+	if (pCell->phenotype.intracellular->need_update() )
 	{	
-		if (
-			pCell->type == get_cell_definition("last_one").type
-			&& PhysiCell::PhysiCell_globals.current_time >= 100.0 
-			&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
-		)
-			pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
+		// if (PhysiCell::PhysiCell_globals.current_time >= 100.0)
+		// 	pCell->type == get_cell_definition("last_one").type
+		// 	&& PhysiCell::PhysiCell_globals.current_time >= 100.0 
+		// 	&& pCell->phenotype.intracellular->get_parameter_value("$time_scale") == 0.0
+		// )
+		// 	pCell->phenotype.intracellular->set_parameter_value("$time_scale", 0.1);
 
-		set_input_nodes(pCell);
+		// set_input_nodes(pCell);
 
 		pCell->phenotype.intracellular->update();
 		
-		from_nodes_to_cell(pCell, phenotype, dt);
-		color_node(pCell);
+		// from_nodes_to_cell(pCell, phenotype, dt);
+		// color_node(pCell);
 	}	
 }
 
 
-void set_input_nodes(Cell* pCell) {}
+// void set_input_nodes(Cell* pCell) {}
 
-void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt) {}
+// void from_nodes_to_cell(Cell* pCell, Phenotype& phenotype, double dt) {}
 
 
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	std::vector< std::string > output( 4 , "rgb(0,0,0)" );
 	
-	if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) )
+	// if ( !pCell->phenotype.intracellular->get_boolean_node_value( parameters.strings("node_to_visualize") ) )
+	if (true)
 	{
 		output[0] = "rgb(255,0,0)";
 		output[2] = "rgb(125,0,0)";
@@ -226,7 +254,7 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 	return output;
 }
 
-void color_node(Cell* pCell){
-	std::string node_name = parameters.strings("node_to_visualize");
-	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
-}
+// void color_node(Cell* pCell){
+// 	std::string node_name = parameters.strings("node_to_visualize");
+// 	pCell->custom_data[node_name] = pCell->phenotype.intracellular->get_boolean_node_value(node_name);
+// }
