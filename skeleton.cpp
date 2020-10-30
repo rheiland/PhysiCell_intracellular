@@ -33,9 +33,11 @@ class Cell {
 int main()
 {
     Cell c;
+    cout << "c.p.imodel ptr (initial Cell)= " << c.p.imodel << endl;  // Intra* pointer exists, but bogus
     Sbml s;
     s.type = "sbml";
     s.start();
     c.p.imodel = &s;
+    cout << "c.p.imodel ptr (after assigning s)= " << c.p.imodel << endl;  
     cout << "c.p.imodel->type = " << c.p.imodel->type << endl;
 }
