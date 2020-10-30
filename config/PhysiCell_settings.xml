@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">480</max_time> <!-- 8640 -->
+		<max_time units="min">60</max_time> <!-- 8640 -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -113,7 +113,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">30</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -190,7 +190,7 @@
 					</options>
 				</motility>
 				<intracellular type="sbml">
-					<filename>./config/Toy_SBML_Model_1.xml</filename>
+					<sbml_filename>./config/Toy_SBML_Model_1.xml</sbml_filename>
 					<time_step>1</time_step>
                     <map1 custom_data="energy" sbml_species="Energy"></map1>
 				</intracellular>
