@@ -3,6 +3,8 @@
 
 #include <string>
 #include <map>
+#include <iomanip>   // for setw
+
 #include "../../../core/PhysiCell.h"
 #include "../../../core/PhysiCell_phenotype.h"
 #include "../../../core/PhysiCell_cell.h"
@@ -23,8 +25,6 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
  public:
 	
 	static long counter;
-	
-	// std::string sbml_filename;
 	
 	double time_step = 12;
 	bool discrete_time = false;
@@ -68,7 +68,9 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
         this->rrHandle = createRRInstance();
 
         // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
-        if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
+        std::cout << "------ librr_intracellular.h:start(): sbml_file = " << sbml_file << std::endl;
+        if ( !rrc::loadSBML(rrHandle, (this->sbml_file).c_str() ) )
+        // if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
         {
 		    std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
 	        // 	printf ("Error message: %s\n", getLastError());
@@ -110,6 +112,26 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
         }
         std::cout << "\n";
 
+        index = 0;
+        // Print out the data
+        for (int row = 0; row < result->RSize; row++)
+        {
+            for (int col = 0; col < result->CSize; col++)
+            {
+                // std::cout << result->Data[index++];
+                std::cout << std::left << std::setw(15) << result->Data[index++];
+                // if (col < result->CSize -1)
+                // {
+                // 	// std::cout << "\t";
+                // 	std::cout << "  ";
+                // }
+            }
+            std::cout << "\n";
+        }
+        // int idx = (result->RSize - 1) * result->CSize + 1;
+        // std::cout << "Saving last energy value (cell custom var) = " << result->Data[idx] << std::endl;
+        // pCell->custom_data[energy_cell_idx]  = result->Data[idx];
+
         return 43;
 	}
 	
@@ -123,16 +145,16 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
         return 42.0;
 	}
 	
-	void set_parameter_value(std::string name, double value) {
+	int set_parameter_value(std::string name, double value) {
 		// this->maboss.set_parameter_value(name, value);
-        return;
+        return 0;
 	}
 	
 	std::string get_state() {
 		// return this->maboss.get_state();
         // const std::string s0 ( "bogus get_state" );
         // return s0;
-        return this->sbml_filename;
+        return this->sbml_file;
 	}
 
     // for now, define dummy methods for these in the abstract parent class

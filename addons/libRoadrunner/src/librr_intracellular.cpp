@@ -4,7 +4,7 @@ SBMLIntracellular::SBMLIntracellular() : Intracellular()
 {
 	type = "sbml";
     std::cout << "====== " << __FUNCTION__ << "() type=" << type << std::endl;
-    std::cout << "====== " << __FUNCTION__ << "() sbml_filename=" <<  sbml_filename << std::endl;
+    std::cout << "====== " << __FUNCTION__ << "() sbml_file = " <<  sbml_file << std::endl;
 	initial_values.clear();
 	// mutations.clear();
 	parameters.clear();
@@ -16,7 +16,7 @@ SBMLIntracellular::SBMLIntracellular(pugi::xml_node& node)
 	type = "sbml";
 	initialize_intracellular_from_pugixml(node);
     std::cout << "====== " << __FUNCTION__ << "(node) type=" << type << std::endl;
-    std::cout << "====== " << __FUNCTION__ << "(node) sbml_filename=" <<  sbml_filename << std::endl;
+    std::cout << "====== " << __FUNCTION__ << "(node) sbml_file = " <<  sbml_file << std::endl;
     std::cout << "====== " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
 
 }
@@ -56,11 +56,11 @@ void SBMLIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 	pugi::xml_node node_sbml = node.child( "sbml_filename" );
 	if ( node_sbml )
 	{ 
-        this->sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
-        // sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
-        // std::cout << "\n========== " << __FILE__ << ", " << __FUNCTION__ << ": ------- sbml_filename = " << sbml_filename << std::endl;
-        // std::cout << "\n------------- "  << __FUNCTION__ << ": sbml_filename = " << sbml_filename << std::endl;
-        std::cout << "\n------------- "  << __FUNCTION__ << ": this->sbml_filename = " << this->sbml_filename << std::endl;
+        this->sbml_file = PhysiCell::xml_get_my_string_value (node_sbml); 
+        // sbml_file = PhysiCell::xml_get_my_string_value (node_sbml); 
+        // std::cout << "\n========== " << __FILE__ << ", " << __FUNCTION__ << ": ------- sbml_file = " << sbml_file << std::endl;
+        // std::cout << "\n------------- "  << __FUNCTION__ << ": sbml_file = " << sbml_file << std::endl;
+        std::cout << "\n------------- "  << __FUNCTION__ << ": this->sbml_file = " << this->sbml_file << std::endl;
     }
 	
 	pugi::xml_node node_parameters = node.child( "parameters" );

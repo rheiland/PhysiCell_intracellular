@@ -547,44 +547,49 @@ class Intracellular
 {
  private:
  public:
-    std::string type;
+    std::string type;  // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
 
-    std::string sbml_filename;
+    // ==========  specific to SBML ==============
+    std::string sbml_file;
+
 	
+    // ================  generic  ================
 	// This function parse the xml cell definition
 	virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
 	
 	// This function initialize the model, needs to be called on each cell once created
-	// virtual void start() = 0;
 	virtual int start() = 0;
-	
-	// This function update the model for the time_step defined in the xml definition
-	// virtual void update() = 0;
-	virtual int update() = 0;
 	
 	// This function checks if it's time to update the model
 	virtual bool need_update() = 0;
-	
-	// This function checks if a node exists
-	virtual bool has_node(std::string name) = 0; 
-	
-	// Access value for boolean model
-	virtual bool get_boolean_node_value(std::string name) = 0;
-	
-	// Set value for boolean model
-	virtual void set_boolean_node_value(std::string name, bool value) = 0;
-	
-	// Get value for maboss model parameter
+
+	// This function update the model for the time_step defined in the xml definition
+	virtual int update() = 0;
+
+	// Get value for model parameter
 	virtual double get_parameter_value(std::string name) = 0;
 	
-	// Set value for maboss model parameter
-	virtual void set_parameter_value(std::string name, double value) = 0;
+	// Set value for model parameter
+	virtual int set_parameter_value(std::string name, double value) = 0;
 
-	virtual void print_current_nodes() = 0;
-	
-	virtual std::string get_state() = 0;
+	virtual std::string get_state() = 0;  // maboss-specific?
 	
 	virtual Intracellular* clone() = 0;
+	
+
+    // ================  specific to "maboss" ================
+	virtual bool has_node(std::string name) = 0; 
+	virtual bool get_boolean_node_value(std::string name) = 0;
+	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	virtual void print_current_nodes() = 0;
+	
+
+    // ================  specific to "sbml" ================
+	virtual bool has_node(std::string name) = 0; 
+	virtual bool get_boolean_node_value(std::string name) = 0;
+	virtual void set_boolean_node_value(std::string name, bool value) = 0;
+	virtual void print_current_nodes() = 0;
+	
 };
 
 class Phenotype
