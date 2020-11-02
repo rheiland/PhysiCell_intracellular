@@ -3,15 +3,22 @@
 SBMLIntracellular::SBMLIntracellular() : Intracellular()
 {
 	type = "sbml";
+    std::cout << "====== " << __FUNCTION__ << "() type=" << type << std::endl;
+    std::cout << "====== " << __FUNCTION__ << "() sbml_filename=" <<  sbml_filename << std::endl;
 	initial_values.clear();
 	// mutations.clear();
 	parameters.clear();
 }
 
+// constructor using XML node
 SBMLIntracellular::SBMLIntracellular(pugi::xml_node& node)
 {
 	type = "sbml";
 	initialize_intracellular_from_pugixml(node);
+    std::cout << "====== " << __FUNCTION__ << "(node) type=" << type << std::endl;
+    std::cout << "====== " << __FUNCTION__ << "(node) sbml_filename=" <<  sbml_filename << std::endl;
+    std::cout << "====== " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
+
 }
 
 SBMLIntracellular::SBMLIntracellular(SBMLIntracellular* copy) 
@@ -46,49 +53,14 @@ SBMLIntracellular::SBMLIntracellular(SBMLIntracellular* copy)
 
 void SBMLIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
 {
-	// pugi::xml_node node_bnd = node.child( "bnd_filename" );
-	// if ( node_bnd )
-	// { bnd_filename = PhysiCell::xml_get_my_string_value (node_bnd); }
-	
-	// pugi::xml_node node_cfg = node.child( "cfg_filename" );
-	// if ( node_cfg )
-	// { cfg_filename = PhysiCell::xml_get_my_string_value (node_cfg); }
-	
-	// pugi::xml_node node_init_values = node.child( "initial_values" );
-	// if( node_init_values )
-	// {
-	// 	pugi::xml_node node_init_value = node_init_values.child( "initial_value" );
-	// 	while( node_init_value )
-	// 	{
-	// 		std::string node_name = node_init_value.attribute( "node" ).value(); 
-	// 		double node_value = PhysiCell::xml_get_my_double_value( node_init_value );
-			
-	// 		initial_values[node_name] = node_value;
-			
-	// 		node_init_value = node_init_value.next_sibling( "initial_value" ); 
-	// 	}
-	// }
-	
-	// pugi::xml_node node_mutations = node.child( "mutations" );
-	// if( node_mutations )
-	// {
-	// 	pugi::xml_node node_mutation = node_mutations.child( "mutation" );
-	// 	while( node_mutation )
-	// 	{
-	// 		std::string node_name = node_mutation.attribute( "node" ).value(); 
-	// 		double node_value = PhysiCell::xml_get_my_double_value( node_mutation );
-			
-	// 		mutations[node_name] = node_value;
-			
-	// 		node_mutation = node_mutation.next_sibling( "mutation" ); 
-	// 	}
-	// }
-
 	pugi::xml_node node_sbml = node.child( "sbml_filename" );
 	if ( node_sbml )
 	{ 
-        sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
-        std::cout << __FILE__ << ", " << __FUNCTION__ << ": ------- sbml_filename = " << sbml_filename << std::endl;
+        this->sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
+        // sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
+        // std::cout << "\n========== " << __FILE__ << ", " << __FUNCTION__ << ": ------- sbml_filename = " << sbml_filename << std::endl;
+        // std::cout << "\n------------- "  << __FUNCTION__ << ": sbml_filename = " << sbml_filename << std::endl;
+        std::cout << "\n------------- "  << __FUNCTION__ << ": this->sbml_filename = " << this->sbml_filename << std::endl;
     }
 	
 	pugi::xml_node node_parameters = node.child( "parameters" );

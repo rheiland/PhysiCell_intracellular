@@ -122,7 +122,7 @@ void create_cell_types( void )
 	build_cell_definitions_maps(); 
     std::cout << "custom.cpp: after build_cell_definitions_maps() " << std::endl;
 	
-	display_cell_definitions( std::cout ); 
+	//rwh display_cell_definitions( std::cout ); 
     std::cout << "custom.cpp: after display_cell_definitions() " << std::endl;
 	
 	return; 
@@ -152,6 +152,25 @@ void setup_tissue( void )
 	double tumor_radius = parameters.doubles("tumor_radius"); // 200.0; 
 	
 	Cell* pCell = NULL; 
+
+#define simpletest
+#ifdef simpletest
+	pCell = create_cell();   // defaults to "default" cell type
+	pCell->assign_position( 0. , 0. , 0.0 );
+    std::cout << "\n------- " << __FUNCTION__ << ": pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << "------------   pheno intra type = " << pCell->phenotype.intracellular->type << std::endl;
+    // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
+    std::cout << "------------   pheno intra get_state = " << pCell->phenotype.intracellular->get_state() << std::endl;
+
+	pCell = create_cell(); 
+	pCell->assign_position( 100. , 0. , 0.0 );
+    std::cout << "\n------- " << __FUNCTION__ << ": pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << "------------   pheno intra type = " << pCell->phenotype.intracellular->type << std::endl;
+    // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
+    std::cout << "------------   pheno intra get_state() = " << pCell->phenotype.intracellular->get_state() << std::endl;
+    std::cout << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
+    std::cout << "------------   pheno intra update() = " <<  pCell->phenotype.intracellular->update() << std::endl;
+#else
 	
 	double x = 0.0; 
 	double x_outer = tumor_radius; 
@@ -203,6 +222,7 @@ void setup_tissue( void )
 		y += cell_spacing * sqrt(3.0)/2.0; 
 		n++; 
 	}
+#endif
 	
 	return; 
 }

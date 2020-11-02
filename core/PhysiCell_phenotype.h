@@ -548,15 +548,19 @@ class Intracellular
  private:
  public:
     std::string type;
+
+    std::string sbml_filename;
 	
 	// This function parse the xml cell definition
 	virtual void initialize_intracellular_from_pugixml(pugi::xml_node& node) = 0;
 	
 	// This function initialize the model, needs to be called on each cell once created
-	virtual void start() = 0;
+	// virtual void start() = 0;
+	virtual int start() = 0;
 	
 	// This function update the model for the time_step defined in the xml definition
-	virtual void update() = 0;
+	// virtual void update() = 0;
+	virtual int update() = 0;
 	
 	// This function checks if it's time to update the model
 	virtual bool need_update() = 0;
