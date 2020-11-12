@@ -189,7 +189,7 @@
 						<use_2D>false</use_2D>
 					</options>
 				</motility>
-				<intracellular type="sbml">
+				<intracellular type="roadrunner">
 					<filename>./config/Toy_SBML_Model_1.xml</filename>
 					<time_step>1</time_step>
                     <map1 custom_data="energy" sbml_species="Energy"></map1>

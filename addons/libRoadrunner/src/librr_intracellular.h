@@ -1,5 +1,5 @@
-#ifndef _SBML_Intracellular_h_
-#define _SBML_Intracellular_h_
+#ifndef _RoadRunner_Intracellular_h_
+#define _RoadRunner_Intracellular_h_
 
 #include <string>
 #include <map>
@@ -11,7 +11,7 @@
 #include "../../../modules/PhysiCell_pugixml.h"
 // #include "maboss_network.h"
 
-// #ifdef ADDON_SBML
+// #ifdef ADDON_ROADRUNNER
 // These are for C
 // #define STATIC_RRC
 #include "rrc_api.h"
@@ -20,7 +20,7 @@
 extern "C" rrc::RRHandle createRRInstance();
 // #endif
 
-class SBMLIntracellular : public PhysiCell::Intracellular {
+class RoadRunnerIntracellular : public PhysiCell::Intracellular {
  private:
  public:
 	
@@ -42,14 +42,14 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
 
 	double next_librr_run = 0;
 
-    SBMLIntracellular();
+    RoadRunnerIntracellular();
 
-	SBMLIntracellular(pugi::xml_node& node);
+	RoadRunnerIntracellular(pugi::xml_node& node);
 	
-	SBMLIntracellular(SBMLIntracellular* copy);
+	RoadRunnerIntracellular(RoadRunnerIntracellular* copy);
 	
 	Intracellular* clone() {
-		return static_cast<Intracellular*>(new SBMLIntracellular(this));
+		return static_cast<Intracellular*>(new RoadRunnerIntracellular(this));
 	}
 	Intracellular* getIntracellularModel() 
     {
@@ -60,37 +60,16 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
     // Need 'int' return type to avoid bizarre compile errors.
-	// void start() 
-	int start() 
-    {
-        std::cout << "------ librr_intracellular.h: start() called\n";
-		// this->maboss.restart_node_values();
-        this->rrHandle = createRRInstance();
-
-        // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
-        std::cout << "------ librr_intracellular.h:start(): sbml_file = " << sbml_file << std::endl;
-        if ( !rrc::loadSBML(rrHandle, (this->sbml_file).c_str() ) )
-        // if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
-        {
-		    std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
-	        // 	printf ("Error message: %s\n", getLastError());
-	        // 	getchar ();
-	        // 	exit (0);
-	    }
-
-        std::cout << "----- start(): rrHandle=" << rrHandle << std::endl;
-        return 42;
-	}
+	int start();
 
     // Need 'int' return type to avoid bizarre compile errors.
 	// void update() 
 	int update() 
     {
-		// this->maboss.run_simulation();
-		// (this->rrHandle).run_simulation();
         // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 10, 10);  // start time, end time, and number of points
         std::cout << "----- update(): rrHandle=" << this->rrHandle << std::endl;
         result = rrc::simulateEx (this->rrHandle, 0, 10, 10);  // start time, end time, and number of points
+
 		// this->next_librr_run += this->rrHandle.get_time_to_update();
         std::cout << "----- update(): result=" << result << std::endl;
         std::cout << "----- update(): result->ColumnHeaders[0]=" << result->ColumnHeaders[0] << std::endl;
@@ -132,7 +111,7 @@ class SBMLIntracellular : public PhysiCell::Intracellular {
         // std::cout << "Saving last energy value (cell custom var) = " << result->Data[idx] << std::endl;
         // pCell->custom_data[energy_cell_idx]  = result->Data[idx];
 
-        return 43;
+        return 0;
 	}
 	
 	bool need_update() {

@@ -1,6 +1,6 @@
 #include "librr_intracellular.h"
 
-SBMLIntracellular::SBMLIntracellular() : Intracellular()
+RoadRunnerIntracellular::RoadRunnerIntracellular() : Intracellular()
 {
 	type = "sbml";
     std::cout << "====== " << __FUNCTION__ << "() type=" << type << std::endl;
@@ -11,9 +11,9 @@ SBMLIntracellular::SBMLIntracellular() : Intracellular()
 }
 
 // constructor using XML node
-SBMLIntracellular::SBMLIntracellular(pugi::xml_node& node)
+RoadRunnerIntracellular::RoadRunnerIntracellular(pugi::xml_node& node)
 {
-	type = "sbml";
+	type = "roadrunner";
 	initialize_intracellular_from_pugixml(node);
     std::cout << "====== " << __FUNCTION__ << "(node) type=" << type << std::endl;
     std::cout << "====== " << __FUNCTION__ << "(node) sbml_file = " <<  sbml_file << std::endl;
@@ -21,7 +21,7 @@ SBMLIntracellular::SBMLIntracellular(pugi::xml_node& node)
 
 }
 
-SBMLIntracellular::SBMLIntracellular(SBMLIntracellular* copy) 
+RoadRunnerIntracellular::RoadRunnerIntracellular(RoadRunnerIntracellular* copy) 
 {
 	type = copy->type;
 	// bnd_filename = copy->bnd_filename;
@@ -51,7 +51,7 @@ SBMLIntracellular::SBMLIntracellular(SBMLIntracellular* copy)
 	// }	
 }
 
-void SBMLIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
+void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
 {
 	pugi::xml_node node_sbml = node.child( "sbml_filename" );
 	if ( node_sbml )
@@ -91,11 +91,33 @@ void SBMLIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 	// }
 }
 
-SBMLIntracellular* getSBMLModel(PhysiCell::Phenotype& phenotype) {
-	return static_cast<SBMLIntracellular*>(phenotype.intracellular);
+int RoadRunnerIntracellular::start()
+{
+    std::cout << "------ librr_intracellular.h: start() called\n";
+    // this->maboss.restart_node_values();
+    this->rrHandle = createRRInstance();
+
+    // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
+    std::cout << "------ librr_intracellular.h:start(): sbml_file = " << sbml_file << std::endl;
+    // if ( !rrc::loadSBML(rrHandle, (this->sbml_file).c_str() ) )
+    if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
+    {
+        std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
+        return -1;
+        // 	printf ("Error message: %s\n", getLastError());
+        // 	getchar ();
+        // 	exit (0);
+    }
+
+    std::cout << "----- start(): rrHandle=" << rrHandle << std::endl;
+    return 0;
 }
 
-// void SBMLIntracellular::save_PhysiBoSS(std::string path, std::string index)
+RoadRunnerIntracellular* getRoadRunnerMLModel(PhysiCell::Phenotype& phenotype) {
+	return static_cast<RoadRunnerIntracellular*>(phenotype.intracellular);
+}
+
+// void RoadRunnerIntracellular::save_PhysiBoSS(std::string path, std::string index)
 // {
 
 // 	std::string state_file_name = path + "/states_" + index + ".csv";
