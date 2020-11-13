@@ -74,7 +74,7 @@
 #ifdef ADDON_PHYSIBOSS
 #include "../addons/PhysiBoSSa/src/maboss_intracellular.h"
 #endif
-#ifdef ADDON_SBML
+#ifdef ADDON_ROADRUNNER
 #include "../addons/libRoadrunner/src/librr_intracellular.h"
 #endif
 
@@ -2129,18 +2129,20 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 #endif
 
-#ifdef ADDON_SBML
-		if (model_type == "sbml") 
+#ifdef ADDON_ROADRUNNER
+		if (model_type == "roadrunner") 
         {
 			// If it has already be copied
 			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
             {
+                std::cout << "------ " << __FUNCTION__ << ": copying another\n";
 				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
             }	
 			// Otherwise we need to create a new one
 			else 
             {
-				SBMLIntracellular* pIntra = new SBMLIntracellular(node);
+                std::cout << "------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
 			}
 		}

@@ -63,56 +63,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular {
 	int start();
 
     // Need 'int' return type to avoid bizarre compile errors.
-	// void update() 
-	int update() 
-    {
-        // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 10, 10);  // start time, end time, and number of points
-        std::cout << "----- update(): rrHandle=" << this->rrHandle << std::endl;
-        result = rrc::simulateEx (this->rrHandle, 0, 10, 10);  // start time, end time, and number of points
-
-		// this->next_librr_run += this->rrHandle.get_time_to_update();
-        std::cout << "----- update(): result=" << result << std::endl;
-        std::cout << "----- update(): result->ColumnHeaders[0]=" << result->ColumnHeaders[0] << std::endl;
-
-
-        // debug - does it generate expected data?
-        int index = 0;
-        // Print out column headers... typically time and species.
-        for (int col = 0; col < result->CSize; col++)
-        {
-            // std::cout << result->ColumnHeaders[index++];
-            // std::cout << std::left << std::setw(15) << result->ColumnHeaders[index++];
-            std::cout << std::left << result->ColumnHeaders[index++];
-            // if (col < result->CSize - 1)
-            // {
-            // 	// std::cout << "\t";
-            // 	std::cout << "  ";
-            // }
-        }
-        std::cout << "\n";
-
-        index = 0;
-        // Print out the data
-        for (int row = 0; row < result->RSize; row++)
-        {
-            for (int col = 0; col < result->CSize; col++)
-            {
-                // std::cout << result->Data[index++];
-                std::cout << std::left << std::setw(15) << result->Data[index++];
-                // if (col < result->CSize -1)
-                // {
-                // 	// std::cout << "\t";
-                // 	std::cout << "  ";
-                // }
-            }
-            std::cout << "\n";
-        }
-        // int idx = (result->RSize - 1) * result->CSize + 1;
-        // std::cout << "Saving last energy value (cell custom var) = " << result->Data[idx] << std::endl;
-        // pCell->custom_data[energy_cell_idx]  = result->Data[idx];
-
-        return 0;
-	}
+	int update();
 	
 	bool need_update() {
 		return PhysiCell::PhysiCell_globals.current_time >= this->next_librr_run;

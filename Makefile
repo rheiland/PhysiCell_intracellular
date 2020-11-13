@@ -1,12 +1,10 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := test_sbml1
+PROGRAM_NAME := test_rr1
 
 CC := g++
-# CC := g++-mp-7 # typical macports compiler name
-# CC := g++-7 # typical homebrew compiler name 
 
 # Check for environment definitions of compiler 
-# e.g., on CC = g++-7 on OSX
+# e.g., on CC = g++-10 on OSX
 ifdef PHYSICELL_CPP 
 	CC := $(PHYSICELL_CPP)
 endif
@@ -17,7 +15,7 @@ endif
 ARCH := native # best auto-tuning 
 
 # CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_SBML
+CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_ROADRUNNER
 # CFLAGS := -march=$(ARCH) -fomit-frame-pointer -Xpreprocessor -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
 
 # OSX
@@ -34,7 +32,7 @@ ifeq ($(OS),Windows_NT)
 	LIBRR_DIR := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m
 	LIBRR_LIBS := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m/bin
 	LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
-	CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_SBML 
+	CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_ROADRUNNER 
 	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
 		OSFLAG += -D AMD64
 	endif
@@ -50,7 +48,7 @@ else
 		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
 		LIBRR_LIBS := ${LIBRR_DIR}/lib
 		# CFLAGS := -march=$(ARCH) -g  -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -m64 -std=c++11 -D ADDON_SBML 
+		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -m64 -std=c++11 -D ADDON_ROADRUNNER 
 	endif
 	ifeq ($(UNAME_S),Darwin)
 #		CC := clang++
@@ -65,7 +63,7 @@ else
 		LIBRR_DIR := $(HOME)/libroadrunner/libroadrunner
 		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
 		# CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_SBML 
+		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_ROADRUNNER 
 	endif
 		ifneq ($(filter %86,$(UNAME_P)),)
 	OSFLAG += -D IA32
@@ -95,10 +93,10 @@ PhysiCell_custom_module_OBJECTS := custom.o
 pugixml_OBJECTS := pugixml.o
 
 # PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
-SBML_OBJECTS := librr_intracellular.o 
+ROADRUNNER_OBJECTS := librr_intracellular.o 
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(SBML_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(ROADRUNNER_OBJECTS)
 
 # compile the project 
 

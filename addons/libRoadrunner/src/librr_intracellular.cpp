@@ -18,13 +18,11 @@ RoadRunnerIntracellular::RoadRunnerIntracellular(pugi::xml_node& node)
     std::cout << "====== " << __FUNCTION__ << "(node) type=" << type << std::endl;
     std::cout << "====== " << __FUNCTION__ << "(node) sbml_file = " <<  sbml_file << std::endl;
     std::cout << "====== " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
-
 }
 
 RoadRunnerIntracellular::RoadRunnerIntracellular(RoadRunnerIntracellular* copy) 
 {
 	type = copy->type;
-	// bnd_filename = copy->bnd_filename;
 	// cfg_filename = copy->cfg_filename;
 	time_step = copy->time_step;
 	discrete_time = copy->discrete_time;
@@ -34,21 +32,6 @@ RoadRunnerIntracellular::RoadRunnerIntracellular(RoadRunnerIntracellular* copy)
 	// mutations = copy->mutations;
 	parameters = copy->parameters;
 	
-	// if (copy->maboss.has_init()) {
-	// if (copy->rrHandle.has_init()) {
-	// 	// maboss.init_maboss(copy->bnd_filename, copy->cfg_filename);
-	// 	// maboss.mutate(mutations);
-
-	// 	rrHandle.set_initial_values(initial_values);
-	// 	rrHandle.set_parameters(parameters);
-	// 	rrHandle.set_update_time_step(copy->time_step);
-	// 	rrHandle.set_discrete_time(copy->discrete_time, copy->time_tick);
-	// 	rrHandle.set_scaling(copy->scaling);
-
-	// 	// maboss.restart_node_values();
-	// 	//maboss.set_state(copy->maboss.get_maboss_state());
-	// 	//std::cout << get_state();
-	// }	
 }
 
 void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& node)
@@ -113,7 +96,57 @@ int RoadRunnerIntracellular::start()
     return 0;
 }
 
-RoadRunnerIntracellular* getRoadRunnerMLModel(PhysiCell::Phenotype& phenotype) {
+int RoadRunnerIntracellular::update()
+{
+        // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 10, 10);  // start time, end time, and number of points
+        std::cout << "----- update(): rrHandle=" << this->rrHandle << std::endl;
+        result = rrc::simulateEx (this->rrHandle, 0, 10, 10);  // start time, end time, and number of points
+
+		// this->next_librr_run += this->rrHandle.get_time_to_update();
+        std::cout << "----- update(): result=" << result << std::endl;
+        std::cout << "----- update(): result->ColumnHeaders[0]=" << result->ColumnHeaders[0] << std::endl;
+
+
+        // debug - does it generate expected data?
+        int index = 0;
+        // Print out column headers... typically time and species.
+        for (int col = 0; col < result->CSize; col++)
+        {
+            // std::cout << result->ColumnHeaders[index++];
+            // std::cout << std::left << std::setw(15) << result->ColumnHeaders[index++];
+            std::cout << std::left << result->ColumnHeaders[index++];
+            // if (col < result->CSize - 1)
+            // {
+            // 	// std::cout << "\t";
+            // 	std::cout << "  ";
+            // }
+        }
+        std::cout << "\n";
+
+        index = 0;
+        // Print out the data
+        for (int row = 0; row < result->RSize; row++)
+        {
+            for (int col = 0; col < result->CSize; col++)
+            {
+                // std::cout << result->Data[index++];
+                std::cout << std::left << std::setw(15) << result->Data[index++];
+                // if (col < result->CSize -1)
+                // {
+                // 	// std::cout << "\t";
+                // 	std::cout << "  ";
+                // }
+            }
+            std::cout << "\n";
+        }
+        // int idx = (result->RSize - 1) * result->CSize + 1;
+        // std::cout << "Saving last energy value (cell custom var) = " << result->Data[idx] << std::endl;
+        // pCell->custom_data[energy_cell_idx]  = result->Data[idx];
+
+        return 0;
+}
+
+RoadRunnerIntracellular* getRoadRunnerModel(PhysiCell::Phenotype& phenotype) {
 	return static_cast<RoadRunnerIntracellular*>(phenotype.intracellular);
 }
 
