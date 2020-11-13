@@ -155,8 +155,8 @@
 		</options>
 
         <intracellular description="transportable species">
-            <species name="oxygen">Oxygen</species>
-            <species name="glucose">Glucose</species>
+            <species name="oxygen">Oxy</species>
+            <species name="glucose">Glc</species>
         </intracellular>
 	</microenvironment_setup>	
 	
@@ -195,12 +195,12 @@
 					</options>
 				</motility>
 				<intracellular type="roadrunner">
-					<sbml_filename>./config/Toy_SBML_Model_1.xml</sbml_filename>
+					<sbml_filename>./config/Toy_SBML_Model_2.xml</sbml_filename>
 					<time_step>1</time_step>
                     <map1 custom_data="energy" sbml_species="Energy"></map1>
 				</intracellular>
 			</phenotype>
-			<custom_data/>
+			<custom_data>
 				<energy units="midichlorian" type="double">0</energy>
 			</custom_data>
 		</cell_definition>
