@@ -24,15 +24,19 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular {
  private:
  public:
 	
-	static long counter;
+	// static long counter;
+	int num_rows_result_table = 1;
 	
-	double time_step = 12;
-	bool discrete_time = false;
-	double time_tick = 0.5;
-	double scaling = 1.0;
+	// double time_step = 12;
+	// bool discrete_time = false;
+	// double time_tick = 0.5;
+	// double scaling = 1.0;
 	
-	std::map<std::string, double> initial_values;
+	// std::map<std::string, double> initial_values;
 	std::map<std::string, double> parameters;
+	std::map<std::string, std::string> substrate_species;
+	std::map<std::string, std::string> custom_data_species;
+	std::map<std::string, int> species_result_column_index;
 	
     // rrc::RRHandle rrHandle = createRRInstance();
     rrc::RRHandle rrHandle;
@@ -62,30 +66,15 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular {
     // Need 'int' return type to avoid bizarre compile errors.
 	int start();
 
+	bool need_update();
+
     // Need 'int' return type to avoid bizarre compile errors.
 	int update();
 	
-	bool need_update() {
-		return PhysiCell::PhysiCell_globals.current_time >= this->next_librr_run;
-	}
+	double get_parameter_value(std::string name);
+	int set_parameter_value(std::string name, double value);
 	
-	double get_parameter_value(std::string name) {
-		// return this->maboss.get_parameter_value(name);
-		// return this->rrHandle.get_parameter_value(name);
-        return 42.0;
-	}
-	
-	int set_parameter_value(std::string name, double value) {
-		// this->maboss.set_parameter_value(name, value);
-        return 0;
-	}
-	
-	std::string get_state() {
-		// return this->maboss.get_state();
-        // const std::string s0 ( "bogus get_state" );
-        // return s0;
-        return this->sbml_file;
-	}
+	std::string get_state();
 
     // for now, define dummy methods for these in the abstract parent class
     bool has_node(std::string name) { return false; }

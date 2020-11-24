@@ -106,18 +106,22 @@ int main( int argc, char* argv[] )
 	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
+    std::cout << "main: after setup_microenvironment() " << std::endl;
 	
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 10; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
+    std::cout << "main: after create_cell_container_for_microenvironment() " << std::endl;
 	
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
+    std::cout << "main: after create_cell_types() " << std::endl;
 	
 	setup_tissue();
+    std::cout << "main: after setup_tissue() " << std::endl;
 
 
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -208,6 +212,17 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
+
+            // If we know for certain that the intracellular updates happen at every dt_diffusion, then do it here?
+            #pragma omp parallel for 
+	        for( int i=0; i < (*all_cells).size(); i++ )
+	        {
+		        if( (*all_cells)[i]->is_out_of_domain == false )
+		        {
+		            (*all_cells)[i]->phenotype.intracellular->update();
+		            (*all_cells)[i]->phenotype.intracellular->get_parameter_value("oxygen");
+		        }
+	        }
 
 
 			// update the microenvironment

@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-300</x_min>
-		<x_max>300</x_max>
-		<y_min>-300</y_min>
-		<y_max>300</y_max>
+		<x_min>-100</x_min>
+		<x_max>100</x_max>
+		<y_min>-100</y_min>
+		<y_max>100</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">60</max_time> <!-- 8640 -->
+		<max_time units="min">0.02</max_time> <!-- 8640 -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -108,12 +108,12 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">60</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">6</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -154,10 +154,6 @@
 			</dirichlet_nodes>
 		</options>
 
-        <intracellular description="transportable species">
-            <species name="oxygen">Oxy</species>
-            <species name="glucose">Glc</species>
-        </intracellular>
 	</microenvironment_setup>	
 	
 	<cell_definitions>
@@ -196,8 +192,9 @@
 				</motility>
 				<intracellular type="roadrunner">
 					<sbml_filename>./config/Toy_SBML_Model_2.xml</sbml_filename>
-					<time_step>1</time_step>
-                    <map1 custom_data="energy" sbml_species="Energy"></map1>
+                    <species substrate="oxygen">Oxy</species>
+                    <species substrate="glucose">Glc</species>
+                    <species custom_data="energy">Energy</species>
 				</intracellular>
 			</phenotype>
 			<custom_data>

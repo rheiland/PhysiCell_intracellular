@@ -91,7 +91,8 @@ void create_cell_types( void )
 
     std::cout << "custom.cpp: 2" << std::endl;
 	cell_defaults.functions.update_migration_bias = NULL; 
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; // update_cell_and_death_parameters_O2_based; 
+	// cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
+	cell_defaults.functions.update_phenotype = NULL; 
 	cell_defaults.functions.custom_cell_rule = NULL; 
 	
     std::cout << "custom.cpp: 3" << std::endl;
@@ -144,6 +145,7 @@ void setup_microenvironment( void )
 
 void setup_tissue( void )
 {
+    std::cout << "\n------- start " << __FUNCTION__ << "  -------------" << std::endl;
     // place a cluster of tumor cells at the center 
 	
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
@@ -165,13 +167,13 @@ void setup_tissue( void )
 	pCell = create_cell(); 
 	// pCell = create_cell(cell_defaults); 
 	pCell->assign_position( 100. , 0. , 0.0 );
-    std::cout << "\n------- " << __FUNCTION__ << ": pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << "------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
     std::cout << "------------   pheno intra type = " << pCell->phenotype.intracellular->type << std::endl;
     std::cout << "------------   pheno intra sbml_file = " << pCell->phenotype.intracellular->sbml_file << std::endl;
     // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
     std::cout << "------------   pheno intra get_state() = " << pCell->phenotype.intracellular->get_state() << std::endl;
     std::cout << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
-    std::cout << "------------   pheno intra update() = " <<  pCell->phenotype.intracellular->update() << std::endl;
+    // std::cout << "------------   pheno intra update() = " <<  pCell->phenotype.intracellular->update() << std::endl;
 #else
 	
 	double x = 0.0; 
@@ -226,6 +228,7 @@ void setup_tissue( void )
 	}
 #endif
 	
+    std::cout << "------- end " << __FUNCTION__ << "  -------------\n" << std::endl;
 	return; 
 }
 
@@ -233,6 +236,7 @@ void setup_tissue( void )
 void tumor_cell_phenotype_with_signaling( Cell* pCell, Phenotype& phenotype, double dt )
 {
 	
+    std::cout << "--------------------  tumor_cell_phenotype_with_signaling called ------------------\n";
 	if (pCell->phenotype.intracellular->need_update() )
 	{	
 		// if (PhysiCell::PhysiCell_globals.current_time >= 100.0)
