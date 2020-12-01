@@ -57,11 +57,14 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	
 	RoadRunnerIntracellular(RoadRunnerIntracellular* copy);
 	
+    // rwh: review this
 	Intracellular* clone()
     {
 		// return static_cast<Intracellular*>(new RoadRunnerIntracellular(this));
 		RoadRunnerIntracellular* clone = new RoadRunnerIntracellular(this);
 		clone->sbml_filename = this->sbml_filename;
+		clone->substrate_species = this->substrate_species;
+		clone->custom_data_species = this->custom_data_species;
 		return static_cast<Intracellular*>(clone);
 	}
 

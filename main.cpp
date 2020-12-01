@@ -123,7 +123,7 @@ int main( int argc, char* argv[] )
 	setup_tissue();
     std::cout << "main.cpp: ----------- after setup_tissue() " << std::endl;
 
-    std::exit(-1);
+    // std::exit(-1);
 
 
 	/* Users typically stop modifying here. END USERMODS */ 
@@ -226,6 +226,13 @@ int main( int argc, char* argv[] )
 		        }
 	        }
 
+            //rwh - argh! manual motility
+	        for( int i=0; i < (*all_cells).size(); i++ )
+            {
+                std::vector<double> pos = (*all_cells)[i]->position;
+                pos[0] += 1.0;
+                (*all_cells)[i]->assign_position(pos[0],pos[1],pos[2]);
+            }
 
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
@@ -233,6 +240,7 @@ int main( int argc, char* argv[] )
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
+
 			//std::cout<< "done" << std::endl;
 			
 			PhysiCell_globals.current_time += diffusion_dt;

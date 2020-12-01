@@ -4,8 +4,8 @@
 
 RoadRunnerIntracellular::RoadRunnerIntracellular() : Intracellular()
 {
-	type = "sbml";
-    std::cout << "====== " << __FUNCTION__ << "() type=" << type << std::endl;
+	intracellular_type = "sbml";
+    std::cout << "====== " << __FUNCTION__ << "() intracellular_type=" << intracellular_type << std::endl;
     std::cout << "====== " << __FUNCTION__ << "() sbml_filename = " <<  sbml_filename << std::endl;
 	// initial_values.clear();
 	// mutations.clear();
@@ -15,13 +15,13 @@ RoadRunnerIntracellular::RoadRunnerIntracellular() : Intracellular()
 // constructor using XML node
 RoadRunnerIntracellular::RoadRunnerIntracellular(pugi::xml_node& node)
 {
-    std::cout << "======rwh " << __FUNCTION__ << ": node.name() =" << node.name() << std::endl;
-	type = "roadrunner";
+    // std::cout << "======rwh " << __FUNCTION__ << ": node.name() =" << node.name() << std::endl;
+	intracellular_type = "roadrunner";
 	initialize_intracellular_from_pugixml(node);
-    std::cout << "======rwh " << __FUNCTION__ << "(node) type=" << type << std::endl;
-    std::cout << "======rwh " << __FUNCTION__ << "(node) sbml_filename = " <<  sbml_filename << std::endl;
-    std::cout << "======rwh " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
-    std::cout << "======rwh " << __FUNCTION__ << "(node) this->sbml_filename=" <<  this->sbml_filename << std::endl;
+    // std::cout << "======rwh " << __FUNCTION__ << "(node) intracellular_type=" << intracellular_type << std::endl;
+    // std::cout << "======rwh " << __FUNCTION__ << "(node) sbml_filename = " <<  sbml_filename << std::endl;
+    // std::cout << "======rwh " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
+    // std::cout << "======rwh " << __FUNCTION__ << "(node) this->sbml_filename=" <<  this->sbml_filename << std::endl;
 }
 
 // Intracellular* RoadRunnerIntracellular::clone() // --> 'Intracellular' does not name a type
@@ -29,9 +29,10 @@ RoadRunnerIntracellular::RoadRunnerIntracellular(pugi::xml_node& node)
 // 	return static_cast<Intracellular*>(new RoadRunnerIntracellular(this));
 // }
 
+// rwh: review this
 RoadRunnerIntracellular::RoadRunnerIntracellular(RoadRunnerIntracellular* copy) 
 {
-	type = copy->type;
+	intracellular_type = copy->intracellular_type;
 	sbml_filename = copy->sbml_filename;
 	// cfg_filename = copy->cfg_filename;
 	// time_step = copy->time_step;
@@ -114,6 +115,7 @@ int RoadRunnerIntracellular::start()
     std::cout << "\n------------ " << __FUNCTION__ << ": librr_intracellular.cpp: start() called\n";
     std::cout << "\n------------ " << __FUNCTION__ << ": doing: rrHandle = createRRInstance()\n";
     rrHandle = createRRInstance();
+    std::cout << "\n------------ " << __FUNCTION__ << ": rrHandle = " << rrHandle << std::endl;
 
     // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
     std::cout << "     sbml_filename = " << sbml_filename << std::endl;
@@ -179,8 +181,9 @@ int RoadRunnerIntracellular::update()
     static int num_vals = 1;
 
     // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 10, 10);  // start time, end time, and number of points
-    // std::cout << "----- update(): rrHandle=" << this->rrHandle << std::endl;
-    result = rrc::simulateEx (this->rrHandle, start_time, end_time, num_vals);  // start time, end time, and number of points
+    std::cout << __FUNCTION__ << " ----- update(): this=" << this << std::endl;
+    std::cout << __FUNCTION__ << " ----- update(): rrHandle=" << this->rrHandle << std::endl;
+    this->result = rrc::simulateEx (this->rrHandle, start_time, end_time, num_vals);  // start time, end time, and number of points
 
     // this->next_librr_run += this->rrHandle.get_time_to_update();
     // std::cout << "----- update(): result=" << result << std::endl;

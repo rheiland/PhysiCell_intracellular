@@ -87,17 +87,17 @@ void create_cell_types( void )
 	
     std::cout << "custom.cpp: 1" << std::endl;
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.functions.update_velocity = NULL;
+	// cell_defaults.functions.update_velocity = NULL;
 
     std::cout << "custom.cpp: 2" << std::endl;
-	cell_defaults.functions.update_migration_bias = NULL; 
+	// cell_defaults.functions.update_migration_bias = NULL; 
 	// cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
-	cell_defaults.functions.update_phenotype = NULL; 
-	cell_defaults.functions.custom_cell_rule = NULL; 
+	// cell_defaults.functions.update_phenotype = NULL; 
+	// cell_defaults.functions.custom_cell_rule = NULL; 
 	
     std::cout << "custom.cpp: 3" << std::endl;
-	cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
-	cell_defaults.functions.calculate_distance_to_membrane = NULL; 
+	// cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
+	// cell_defaults.functions.calculate_distance_to_membrane = NULL; 
 	
     std::cout << "custom.cpp: 4" << std::endl;
 	// cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
@@ -122,8 +122,15 @@ void create_cell_types( void )
 
 	build_cell_definitions_maps(); 
     std::cout << "custom.cpp: after build_cell_definitions_maps() " << std::endl;
+
+    // rwh - why aren't the cells motile??!
+    cell_defaults.phenotype.motility.is_motile = true;
+	cell_defaults.phenotype.motility.persistence_time = 0.0;  // parameters.doubles("persistence_time"); 
+	cell_defaults.phenotype.motility.migration_speed = 100.;  // parameters.doubles("migration_speed"); 
+	cell_defaults.phenotype.motility.migration_bias_direction = { 1.0, 0.0, 0.0 };  
+	cell_defaults.phenotype.motility.migration_bias = 0.5;  // parameters.doubles("migration_bias"); 
 	
-	//rwh display_cell_definitions( std::cout ); 
+	display_cell_definitions( std::cout ); 
     std::cout << "custom.cpp: after display_cell_definitions() " << std::endl;
 	
 	return; 
@@ -139,12 +146,51 @@ void setup_microenvironment( void )
 	// initialize BioFVM 
 	
 	initialize_microenvironment(); 	
+
+    int oxygen_i = microenvironment.find_density_index( "oxygen" ); 
+    int glucose_i = microenvironment.find_density_index( "glucose" ); 
+    std::cout << "---------- setup_microenv\n";
+    std::cout << "    oxygen_i = " << oxygen_i << std::endl;
+    std::cout << "    glucose_i = " << glucose_i << std::endl;
+    double oxy = 38.0;  // IC
+    double oxy_del = 9.0;
+    double glu = 32.0;  // IC
+    double glu_del = 7.5;
+    double x;
+    // double xmin = -750.;
+    double xmin = -400.;
+    int nregions = 5;
+    // nregions = 800;
+    // oxy_del = oxy/nregions;
+    // glu_del = glu/nregions;
+	// double xdel = 1500./nregions;
+    double xdel = -2*xmin/nregions;
+    // 5 regions across x: [-750:-450:-150:150:450:750]
+    std::cout << "setup_microenvironment: num voxels= " << microenvironment.number_of_voxels() << std::endl;
+    for( int n=0; n < microenvironment.number_of_voxels(); n++ )
+    {
+        // x coordinate of the nth voxel's center
+        x = microenvironment.mesh.voxels[n].center[0];
+		for( int iregion=1; iregion <= nregions; iregion++ )
+		{
+			if (x < (xmin + iregion*xdel))
+			{
+				microenvironment(n)[oxygen_i] = oxy - (iregion-1)*oxy_del;
+				microenvironment(n)[glucose_i] = glu - (iregion-1)*glu_del;
+				break;
+			}
+			// oxy -= iregion-5;
+			// glu -= iregion-2;
+		}
+    }
 	
 	return; 
 }
 
 void setup_tissue( void )
 {
+    int retval;
+
     std::cout << "\n------- start " << __FUNCTION__ << "  -------------" << std::endl;
     // place a cluster of tumor cells at the center 
 	
@@ -167,14 +213,32 @@ void setup_tissue( void )
 	// pCell = create_cell(); 
     pCell = create_cell(get_cell_definition("default")); 
 	// pCell = create_cell(cell_defaults); 
-	pCell->assign_position( 100. , 0. , 0.0 );
-    std::cout << __FUNCTION__ << "------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
-    std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->type << std::endl;
+    double xval = -300.0;
+	pCell->assign_position( xval, 0. , 0.0 );
+    std::cout << __FUNCTION__ << ": cell 1 ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->intracellular_type << std::endl;
     // std::cout << __FUNCTION__ << "------------   pheno intra sbml_filename = " << pCell->phenotype.intracellular->sbml_filename << std::endl;
     // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
-    std::cout << __FUNCTION__ << "------------   pheno intra get_state() = " << pCell->phenotype.intracellular->get_state() << std::endl;
-    std::cout << __FUNCTION__ << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
+    std::string str_retval = pCell->phenotype.intracellular->get_state();
+    std::cout << __FUNCTION__ << "------------   pheno intra get_state() retval = " << str_retval << std::endl;
+
+    retval = pCell->phenotype.intracellular->start();
+    std::cout << __FUNCTION__ << "------------   pheno intra start() retval = " << retval << std::endl;
+    // std::cout << __FUNCTION__ << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
+
     // std::cout << "------------   pheno intra update() = " <<  pCell->phenotype.intracellular->update() << std::endl;
+
+    double yval = 200.0;
+    // pCell = create_cell(get_cell_definition("default")); 
+    pCell = create_cell(); 
+    std::cout << __FUNCTION__ << ": cell 2 ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    retval = pCell->phenotype.intracellular->start();
+	pCell->assign_position( xval, yval, 0.0 );
+
+    pCell = create_cell(); 
+    std::cout << __FUNCTION__ << ": cell 3 ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    retval = pCell->phenotype.intracellular->start();
+	pCell->assign_position( xval, -yval, 0.0 );
 #else
 	
 	double x = 0.0; 
