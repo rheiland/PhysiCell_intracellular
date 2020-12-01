@@ -191,7 +191,7 @@
 					</options>
 				</motility>
 				<intracellular type="roadrunner">
-					<sbml_filename>./config/Toy_SBML_Model_2.xml</sbml_filename>
+					<sbml_filename>./config/Toy_SBML_Model_1.xml</sbml_filename>
                     <species substrate="oxygen">Oxy</species>
                     <species substrate="glucose">Glc</species>
                     <species custom_data="energy">Energy</species>

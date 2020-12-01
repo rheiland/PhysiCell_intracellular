@@ -113,15 +113,17 @@ int main( int argc, char* argv[] )
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 10; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
-    std::cout << "main: after create_cell_container_for_microenvironment() " << std::endl;
+    std::cout << "main.cpp: -----------  after create_cell_container_for_microenvironment() " << std::endl;
 	
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
-    std::cout << "main: after create_cell_types() " << std::endl;
+    std::cout << "main.cpp: -----------  after create_cell_types() " << std::endl;
 	
 	setup_tissue();
-    std::cout << "main: after setup_tissue() " << std::endl;
+    std::cout << "main.cpp: ----------- after setup_tissue() " << std::endl;
+
+    std::exit(-1);
 
 
 	/* Users typically stop modifying here. END USERMODS */ 

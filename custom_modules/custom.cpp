@@ -164,15 +164,16 @@ void setup_tissue( void )
     // // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
     // std::cout << "------------   pheno intra get_state = " << pCell->phenotype.intracellular->get_state() << std::endl;
 
-	pCell = create_cell(); 
+	// pCell = create_cell(); 
+    pCell = create_cell(get_cell_definition("default")); 
 	// pCell = create_cell(cell_defaults); 
 	pCell->assign_position( 100. , 0. , 0.0 );
-    std::cout << "------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
-    std::cout << "------------   pheno intra type = " << pCell->phenotype.intracellular->type << std::endl;
-    std::cout << "------------   pheno intra sbml_file = " << pCell->phenotype.intracellular->sbml_file << std::endl;
+    std::cout << __FUNCTION__ << "------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->type << std::endl;
+    // std::cout << __FUNCTION__ << "------------   pheno intra sbml_filename = " << pCell->phenotype.intracellular->sbml_filename << std::endl;
     // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
-    std::cout << "------------   pheno intra get_state() = " << pCell->phenotype.intracellular->get_state() << std::endl;
-    std::cout << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
+    std::cout << __FUNCTION__ << "------------   pheno intra get_state() = " << pCell->phenotype.intracellular->get_state() << std::endl;
+    std::cout << __FUNCTION__ << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
     // std::cout << "------------   pheno intra update() = " <<  pCell->phenotype.intracellular->update() << std::endl;
 #else
 	

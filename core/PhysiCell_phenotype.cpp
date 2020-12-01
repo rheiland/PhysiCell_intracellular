@@ -1076,9 +1076,10 @@ void Phenotype::operator=(const Phenotype &p ) {
 	secretion = p.secretion;
 	
 	molecular = p.molecular;
-	
 	if (p.intracellular != NULL)
+    {
 		intracellular = p.intracellular->clone();
+    }
 }
 	
 void Phenotype::operator=(Phenotype &p ) { 
@@ -1095,9 +1096,10 @@ void Phenotype::operator=(Phenotype &p ) {
 	secretion = p.secretion;
 	
 	molecular = p.molecular;
-	
 	if (p.intracellular != NULL)
+    {
 		intracellular = p.intracellular->clone();
+    }
 }
 
 /*

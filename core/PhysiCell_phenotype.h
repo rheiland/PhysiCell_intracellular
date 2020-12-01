@@ -550,7 +550,7 @@ class Intracellular
     std::string type;  // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
 
     // ==========  specific to SBML ==============
-    std::string sbml_file;
+    // std::string sbml_filename;
 
 	
     // ================  generic  ================
@@ -585,10 +585,6 @@ class Intracellular
 	
 
     // ================  specific to "sbml" ================
-	virtual bool has_node(std::string name) = 0; 
-	virtual bool get_boolean_node_value(std::string name) = 0;
-	virtual void set_boolean_node_value(std::string name, bool value) = 0;
-	virtual void print_current_nodes() = 0;
 	
 };
 
@@ -610,7 +606,7 @@ class Phenotype
 	Molecular molecular; 
 	
 	// We need it to be a pointer to allow polymorphism
-	// then this object could be a MaBoSSIntracellular, or a SBMLIntracellular
+	// then this object could be a MaBoSSIntracellular, or a RoadRunnerIntracellular
 	Intracellular* intracellular;
 	
 	Phenotype(); // done 

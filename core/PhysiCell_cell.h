@@ -120,6 +120,10 @@ class Cell_Definition
  public: 
 	int type; 
 	std::string name; 
+
+    // intracellular model filenames
+	// std::string sbml_name = "unknown"; 
+	// std::string maboss_name = "unknown"; 
  
 	Microenvironment* pMicroenvironment; 
 	

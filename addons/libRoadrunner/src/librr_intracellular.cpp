@@ -6,7 +6,7 @@ RoadRunnerIntracellular::RoadRunnerIntracellular() : Intracellular()
 {
 	type = "sbml";
     std::cout << "====== " << __FUNCTION__ << "() type=" << type << std::endl;
-    std::cout << "====== " << __FUNCTION__ << "() sbml_file = " <<  sbml_file << std::endl;
+    std::cout << "====== " << __FUNCTION__ << "() sbml_filename = " <<  sbml_filename << std::endl;
 	// initial_values.clear();
 	// mutations.clear();
 	parameters.clear();
@@ -15,17 +15,24 @@ RoadRunnerIntracellular::RoadRunnerIntracellular() : Intracellular()
 // constructor using XML node
 RoadRunnerIntracellular::RoadRunnerIntracellular(pugi::xml_node& node)
 {
-    std::cout << "====== " << __FUNCTION__ << ": node.name() =" << node.name() << std::endl;
+    std::cout << "======rwh " << __FUNCTION__ << ": node.name() =" << node.name() << std::endl;
 	type = "roadrunner";
 	initialize_intracellular_from_pugixml(node);
-    std::cout << "====== " << __FUNCTION__ << "(node) type=" << type << std::endl;
-    std::cout << "====== " << __FUNCTION__ << "(node) sbml_file = " <<  sbml_file << std::endl;
-    std::cout << "====== " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
+    std::cout << "======rwh " << __FUNCTION__ << "(node) type=" << type << std::endl;
+    std::cout << "======rwh " << __FUNCTION__ << "(node) sbml_filename = " <<  sbml_filename << std::endl;
+    std::cout << "======rwh " << __FUNCTION__ << "(node) this=" <<  this << std::endl;
+    std::cout << "======rwh " << __FUNCTION__ << "(node) this->sbml_filename=" <<  this->sbml_filename << std::endl;
 }
+
+// Intracellular* RoadRunnerIntracellular::clone() // --> 'Intracellular' does not name a type
+// {
+// 	return static_cast<Intracellular*>(new RoadRunnerIntracellular(this));
+// }
 
 RoadRunnerIntracellular::RoadRunnerIntracellular(RoadRunnerIntracellular* copy) 
 {
 	type = copy->type;
+	sbml_filename = copy->sbml_filename;
 	// cfg_filename = copy->cfg_filename;
 	// time_step = copy->time_step;
 	// discrete_time = copy->discrete_time;
@@ -49,11 +56,8 @@ void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_no
 	pugi::xml_node node_sbml = node.child( "sbml_filename" );
 	if ( node_sbml )
 	{ 
-        this->sbml_file = PhysiCell::xml_get_my_string_value (node_sbml); 
-        // sbml_file = PhysiCell::xml_get_my_string_value (node_sbml); 
-        // std::cout << "\n========== " << __FILE__ << ", " << __FUNCTION__ << ": ------- sbml_file = " << sbml_file << std::endl;
-        // std::cout << "\n------------- "  << __FUNCTION__ << ": sbml_file = " << sbml_file << std::endl;
-        std::cout << "\n------------- "  << __FUNCTION__ << ": this->sbml_file = " << this->sbml_file << std::endl;
+        sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml); 
+        std::cout << "\n------------- "  << __FUNCTION__ << ": sbml_filename = " << sbml_filename << std::endl;
     }
 	
 	pugi::xml_node node_species = node.child( "species" );
@@ -64,7 +68,7 @@ void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_no
 		if( substrate_name != "" )
 		{
 			std::string species_name = PhysiCell::xml_get_my_string_value( node_species );
-			this->substrate_species[substrate_name] = species_name;
+			substrate_species[substrate_name] = species_name;
             // std::cout << "\n------------- "  << __FUNCTION__ << ": species_name= " << species_name << std::endl;
 		}
 
@@ -73,7 +77,7 @@ void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_no
 		if( custom_data_name != "" )
 		{
 			std::string species_name = PhysiCell::xml_get_my_string_value( node_species );
-			this->custom_data_species[custom_data_name] = species_name;
+			custom_data_species[custom_data_name] = species_name;
             // std::cout << "\n------------- "  << __FUNCTION__ << ": species_name= " << species_name << std::endl;
 		}
 
@@ -81,7 +85,7 @@ void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_no
 	}
 	
     std::cout << "  ------- substrate_species map:"  << std::endl;
-    for(auto elm : this->substrate_species)
+    for(auto elm : substrate_species)
     {
         std::cout << "      "  << elm.first << " -> " << elm.second << std::endl;
     }
@@ -107,15 +111,17 @@ int RoadRunnerIntracellular::start()
 {
     rrc::RRVectorPtr vptr;
 
-    std::cout << "\n------------ " << __FUNCTION__ << "------ librr_intracellular.cpp: start() called\n";
-    this->rrHandle = createRRInstance();
+    std::cout << "\n------------ " << __FUNCTION__ << ": librr_intracellular.cpp: start() called\n";
+    std::cout << "\n------------ " << __FUNCTION__ << ": doing: rrHandle = createRRInstance()\n";
+    rrHandle = createRRInstance();
 
     // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
-    std::cout << "     sbml_file = " << sbml_file << std::endl;
+    std::cout << "     sbml_filename = " << sbml_filename << std::endl;
 
     // TODO: don't hard-code name
-    // if ( !rrc::loadSBML(rrHandle, (this->sbml_file).c_str() ) )
-    if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
+    if ( !rrc::loadSBML(rrHandle, (sbml_filename).c_str() ) )
+    // std::cout << "     for now, hard-coding sbml_file = ./config/Toy_SBML_Model_1.xml" << std::endl;
+    // if (!rrc::loadSBML(rrHandle, "./config/Toy_SBML_Model_1.xml") )
     {
         std::cerr << "------------->>>>>  Error while loading SBML file  <-------------\n\n";
         return -1;

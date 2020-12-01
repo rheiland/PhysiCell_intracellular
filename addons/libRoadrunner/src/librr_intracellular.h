@@ -20,11 +20,16 @@
 extern "C" rrc::RRHandle createRRInstance();
 // #endif
 
-class RoadRunnerIntracellular : public PhysiCell::Intracellular {
+class RoadRunnerIntracellular : public PhysiCell::Intracellular 
+{
  private:
  public:
 	
 	// static long counter;
+
+    std::string sbml_filename;
+
+
 	int num_rows_result_table = 1;
 	
 	// double time_step = 12;
@@ -52,9 +57,14 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular {
 	
 	RoadRunnerIntracellular(RoadRunnerIntracellular* copy);
 	
-	Intracellular* clone() {
-		return static_cast<Intracellular*>(new RoadRunnerIntracellular(this));
+	Intracellular* clone()
+    {
+		// return static_cast<Intracellular*>(new RoadRunnerIntracellular(this));
+		RoadRunnerIntracellular* clone = new RoadRunnerIntracellular(this);
+		clone->sbml_filename = this->sbml_filename;
+		return static_cast<Intracellular*>(clone);
 	}
+
 	Intracellular* getIntracellularModel() 
     {
         std::cout << "------ librr_intracellular: getIntracellularModel called\n";
