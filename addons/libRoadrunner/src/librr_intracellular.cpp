@@ -108,13 +108,16 @@ void RoadRunnerIntracellular::initialize_intracellular_from_pugixml(pugi::xml_no
 	// }
 }
 
+// called when a new cell is created; creates the unique 'rrHandle'
 int RoadRunnerIntracellular::start()
 {
     rrc::RRVectorPtr vptr;
 
     std::cout << "\n------------ " << __FUNCTION__ << ": librr_intracellular.cpp: start() called\n";
     std::cout << "\n------------ " << __FUNCTION__ << ": doing: rrHandle = createRRInstance()\n";
+
     rrHandle = createRRInstance();
+
     std::cout << "\n------------ " << __FUNCTION__ << ": rrHandle = " << rrHandle << std::endl;
 
     // if (!rrc::loadSBML (rrHandle, get_cell_definition("lung epithelium").sbml_filename.c_str())) 
@@ -174,31 +177,37 @@ bool RoadRunnerIntracellular::need_update()
     return PhysiCell::PhysiCell_globals.current_time >= this->next_librr_run;
 }
 
+// solve the intracellular model
 int RoadRunnerIntracellular::update()
 {
     static double start_time = 0.0;
     static double end_time = 0.01;
-    static int num_vals = 1;
+    // static double end_time = 10.0;
+    // static int num_vals = 1;
+    // static int num_vals = 10;
+    static int num_vals = 2;
 
     // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 10, 10);  // start time, end time, and number of points
     std::cout << __FUNCTION__ << " ----- update(): this=" << this << std::endl;
     std::cout << __FUNCTION__ << " ----- update(): rrHandle=" << this->rrHandle << std::endl;
+
     this->result = rrc::simulateEx (this->rrHandle, start_time, end_time, num_vals);  // start time, end time, and number of points
+
 
     // this->next_librr_run += this->rrHandle.get_time_to_update();
     // std::cout << "----- update(): result=" << result << std::endl;
-    std::cout << "----- update(): result->CSize=" << result->CSize << std::endl;
-    std::cout << "----- update(): result->RSize=" << result->RSize << std::endl;  // should be = num_vals
+    std::cout << "----- update(): result->CSize=" << this->result->CSize << std::endl;
+    std::cout << "----- update(): result->RSize=" << this->result->RSize << std::endl;  // should be = num_vals
     // std::cout << "----- update(): result->ColumnHeaders[0]=" << result->ColumnHeaders[0] << std::endl;  // = "time"
 
     // debug - does it generate expected data?
     int index = 0;
     // Print out column headers... typically time and species.
-    for (int col = 0; col < result->CSize; col++)
+    for (int col = 0; col < this->result->CSize; col++)
     {
         // std::cout << result->ColumnHeaders[index++];
         // std::cout << std::left << std::setw(15) << result->ColumnHeaders[index++];
-        std::cout << std::left << result->ColumnHeaders[index++];
+        std::cout << std::left << this->result->ColumnHeaders[index++];
         // if (col < result->CSize - 1)
         // {
         // 	// std::cout << "\t";
@@ -209,12 +218,12 @@ int RoadRunnerIntracellular::update()
 
     index = 0;
     // Print out the data
-    for (int row = 0; row < result->RSize; row++)
+    for (int row = 0; row < this->result->RSize; row++)
     {
-        for (int col = 0; col < result->CSize; col++)
+        for (int col = 0; col < this->result->CSize; col++)
         {
             // std::cout << result->Data[index++];
-            std::cout << std::left << std::setw(15) << result->Data[index++];
+            std::cout << std::left << std::setw(15) << this->result->Data[index++];
             // if (col < result->CSize -1)
             // {
             // 	// std::cout << "\t";
@@ -230,10 +239,13 @@ int RoadRunnerIntracellular::update()
     return 0;
 }
 
-double RoadRunnerIntracellular::get_parameter_value(std::string substrate_name)
+double RoadRunnerIntracellular::get_parameter_value(std::string param_name)
 {
+    rrc::RRVectorPtr vptr;
+
     std::cout << "-----------"  << __FUNCTION__ << "-----------" << std::endl;
-    std::cout << "    substrate_name = " << substrate_name << std::endl;
+    // std::cout << "    substrate_name = " << substrate_name << std::endl;
+    std::cout << "    param_name = " << param_name << std::endl;
 
     // TODO: optimize this eventually
     // std::map<std::string, int> species_result_column_index;
@@ -241,19 +253,36 @@ double RoadRunnerIntracellular::get_parameter_value(std::string substrate_name)
     // int offset = (num_rows_result_table-1) * result->CSize - 1;
     // int offset = (num_rows_result_table-1) * result->CSize;
     // offset += (num_rows_result_table-1) * result->CSize - 1;
-    // int offset = species_result_column_index[name];
-    std::string species_name = this->substrate_species[substrate_name];
-    std::cout << "    species_name = " << species_name << std::endl;
 
-    int offset = species_result_column_index[species_name];
+    // int offset = species_result_column_index[name];
+    // std::string species_name = this->substrate_species[substrate_name];
+    // std::cout << "    species_name = " << species_name << std::endl;
+
+    vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
+    std::cerr << vptr->Count << std::endl;
+    for (int kdx=0; kdx<vptr->Count; kdx++)
+    {
+        std::cerr << kdx << ") " << vptr->Data[kdx] << std::endl;
+    }
+
+    int offset = species_result_column_index[param_name];
     std::cout << "    result offset = "<< offset << std::endl;
-    double res = this->result->Data[offset];
+    // double res = this->result->Data[offset];
+    double res = vptr->Data[offset];
     std::cout << "    res = " << res << std::endl;
 	return res;
 }
 	
-int RoadRunnerIntracellular::set_parameter_value(std::string name, double value)
+// rwh: might consider doing a multi-[species_name, value] "set" method
+int RoadRunnerIntracellular::set_parameter_value(std::string species_name, double value)
 {
+    rrc::RRVectorPtr vptr;
+
+    vptr = rrc::getFloatingSpeciesConcentrations(this->rrHandle);
+    int idx = species_result_column_index[species_name];
+    vptr->Data[idx] = value;
+	// rrc::setFloatingSpeciesConcentrations(pCell->phenotype.molecular.model_rr, vptr);
+	rrc::setFloatingSpeciesConcentrations(this->rrHandle, vptr);
     return 0;
 }
 
