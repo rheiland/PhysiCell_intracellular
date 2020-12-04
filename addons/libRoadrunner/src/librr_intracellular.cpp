@@ -114,6 +114,8 @@ int RoadRunnerIntracellular::start()
     rrc::RRVectorPtr vptr;
 
     std::cout << "\n------------ " << __FUNCTION__ << ": librr_intracellular.cpp: start() called\n";
+    // this->enabled = true;
+
     std::cout << "\n------------ " << __FUNCTION__ << ": doing: rrHandle = createRRInstance()\n";
 
     rrHandle = createRRInstance();
@@ -190,6 +192,9 @@ int RoadRunnerIntracellular::update()
     // result = rrc::simulateEx (pCell->phenotype.molecular.model_rr, 0, 10, 10);  // start time, end time, and number of points
     std::cout << __FUNCTION__ << " ----- update(): this=" << this << std::endl;
     std::cout << __FUNCTION__ << " ----- update(): rrHandle=" << this->rrHandle << std::endl;
+
+    // if (this->result != 0)   // apparently not necessary (done in freeRRCData hopefully)
+    rrc::freeRRCData (this->result);
 
     this->result = rrc::simulateEx (this->rrHandle, start_time, end_time, num_vals);  // start time, end time, and number of points
 
@@ -302,5 +307,5 @@ RoadRunnerIntracellular* getRoadRunnerModel(PhysiCell::Phenotype& phenotype) {
 
 std::string RoadRunnerIntracellular::get_state()
 {
-    return "bogus_libroadrunner_sbml_state";
+    return sbml_filename;
 }

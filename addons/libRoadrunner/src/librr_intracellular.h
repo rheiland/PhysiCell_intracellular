@@ -28,6 +28,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
 	// static long counter;
 
     std::string sbml_filename;
+    // bool enabled = false;
 
 
 	int num_rows_result_table = 1;
@@ -47,7 +48,7 @@ class RoadRunnerIntracellular : public PhysiCell::Intracellular
     rrc::RRHandle rrHandle;
     // rrc::RRHandle rrHandle;
     // rrc::RRVectorPtr vptr;
-	rrc::RRCDataPtr result;  // start time, end time, and number of points
+	rrc::RRCDataPtr result = 0;  // start time, end time, and number of points
 
 	double next_librr_run = 0;
 

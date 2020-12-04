@@ -547,7 +547,8 @@ class Intracellular
 {
  private:
  public:
-    std::string type;  // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
+    std::string intracellular_type;  // specified in XML <intracellular type="...">:  "maboss", "sbml", ...
+	// bool enabled; 
 
     // ==========  specific to SBML ==============
     // std::string sbml_filename;
@@ -572,7 +573,7 @@ class Intracellular
 	// Set value for model parameter
 	virtual int set_parameter_value(std::string name, double value) = 0;
 
-	virtual std::string get_state() = 0;  // maboss-specific?
+	virtual std::string get_state() = 0;  
 	
 	virtual Intracellular* clone() = 0;
 	

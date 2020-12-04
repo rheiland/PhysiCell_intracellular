@@ -167,6 +167,8 @@ void setup_microenvironment( void )
     double xdel = -2*xmin/nregions;
     // 5 regions across x: [-750:-450:-150:150:450:750]
     std::cout << "setup_microenvironment: num voxels= " << microenvironment.number_of_voxels() << std::endl;
+#undef substrate_regions
+#ifdef substrate_regions
     for( int n=0; n < microenvironment.number_of_voxels(); n++ )
     {
         // x coordinate of the nth voxel's center
@@ -183,6 +185,7 @@ void setup_microenvironment( void )
 			// glu -= iregion-2;
 		}
     }
+#endif
 	
 	return; 
 }
@@ -214,29 +217,35 @@ void setup_tissue( void )
     pCell = create_cell(get_cell_definition("default")); 
 	// pCell = create_cell(cell_defaults); 
     double xval = -300.0;
-	pCell->assign_position( xval, 0. , 0.0 );
-    std::cout << __FUNCTION__ << ": cell 1 ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
-    std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->intracellular_type << std::endl;
+    double yval = 200.0;
+	pCell->assign_position( xval, yval , 0.0 );
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+
+    // std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->intracellular_type << std::endl;
     // std::cout << __FUNCTION__ << "------------   pheno intra sbml_filename = " << pCell->phenotype.intracellular->sbml_filename << std::endl;
     // std::cout << "------------   pheno intra sbml_filename = " << (SBMLIntracellular*)(pCell->phenotype.intracellular)->sbml_filename << std::endl;
-    std::string str_retval = pCell->phenotype.intracellular->get_state();
-    std::cout << __FUNCTION__ << "------------   pheno intra get_state() retval = " << str_retval << std::endl;
+    // std::string str_retval = pCell->phenotype.intracellular->get_state();
+    // std::cout << __FUNCTION__ << "------------   pheno intra get_state() retval = " << str_retval << std::endl;
 
-    retval = pCell->phenotype.intracellular->start();
-    std::cout << __FUNCTION__ << "------------   pheno intra start() retval = " << retval << std::endl;
+    pCell->phenotype.intracellular = NULL;
+    // retval = pCell->phenotype.intracellular->start();
+
+    // std::cout << __FUNCTION__ << "------------   pheno intra start() retval = " << retval << std::endl;
     // std::cout << __FUNCTION__ << "------------   pheno intra start() = " << (pCell->phenotype.intracellular)->start() << std::endl;
 
     // std::cout << "------------   pheno intra update() = " <<  pCell->phenotype.intracellular->update() << std::endl;
 
-    double yval = 200.0;
+
     // pCell = create_cell(get_cell_definition("default")); 
     pCell = create_cell(); 
-    std::cout << __FUNCTION__ << ": cell 2 ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
     retval = pCell->phenotype.intracellular->start();
-	pCell->assign_position( xval, yval, 0.0 );
+	pCell->assign_position( xval, 0.0, 0.0 );
 
-    pCell = create_cell(); 
-    std::cout << __FUNCTION__ << ": cell 3 ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+
+    pCell = create_cell(get_cell_definition("celltype1")); 
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    std::cout << "------------   pheno intra get_state (sbml_filename) = " << pCell->phenotype.intracellular->get_state() << std::endl;
     retval = pCell->phenotype.intracellular->start();
 	pCell->assign_position( xval, -yval, 0.0 );
 #else

@@ -82,9 +82,56 @@
 using namespace BioFVM;
 using namespace PhysiCell;
 
-int main( int argc, char* argv[] )
+// globals: indices to microenv substrates
+int oxygen_i; 
+int glucose_i; 
+
+void update_intracellular()
 {
 	int retval;
+
+    // rwh: todo: optimize 
+    // If we know for certain that the intracellular updates happen at every dt_diffusion, then do it here?
+    // #pragma omp parallel for 
+    for( int i=0; i < (*all_cells).size(); i++ )
+    {
+        // if( ((*all_cells)[i]->phenotype.intracellular != NULL ) && ((*all_cells)[i]->is_out_of_domain == false ) )
+        if( (*all_cells)[i]->is_out_of_domain == false  )
+        {
+          std::cout << "main.cpp:    update_intracellular():  ID = " << (*all_cells)[i]->ID << std::endl;
+        //   if( (*all_cells)[i]->phenotype.intracellular->enabled == false  )
+          if( (*all_cells)[i]->phenotype.intracellular == NULL  )
+          {
+            //   std::cout << "main.cpp:  cell ID= " << (*all_cells)[i]->ID << " intracellular is disabled\n";
+              std::cout << "main.cpp:  cell ID= " << (*all_cells)[i]->ID << " has NULL intracellular\n";
+          }
+          else
+          {
+            // Find voxel index for this cell
+            int vi = microenvironment.nearest_voxel_index((*all_cells)[i]->position);
+
+            // Obtain substrate value(s) for this voxel and update the corresponding species in SBML
+            double oxy_val = microenvironment(vi)[oxygen_i];
+            std::cout << "main.cpp:  oxy_val = " << oxy_val << std::endl; 
+            retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Oxy",oxy_val);
+
+            double glucose_val = microenvironment(vi)[glucose_i];
+            std::cout << "main.cpp:  glucose_val = " << glucose_val << std::endl; 
+            retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Glc",glucose_val);
+
+            (*all_cells)[i]->phenotype.intracellular->update();  // run solver
+
+            // really only need to do if saving results
+            (*all_cells)[i]->custom_data["energy"] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Energy");
+
+          }
+        }
+    }
+    // std::exit(-1);
+}
+
+int main( int argc, char* argv[] )
+{
 
 	// load and parse settings file(s)
 	bool XML_status = false; 
@@ -108,8 +155,8 @@ int main( int argc, char* argv[] )
 	
 	setup_microenvironment(); // modify this in the custom code 
     std::cout << "main: after setup_microenvironment() " << std::endl;
-    int oxygen_i = microenvironment.find_density_index( "oxygen" ); 
-	int glucose_i = microenvironment.find_density_index( "glucose" ); 
+    oxygen_i = microenvironment.find_density_index( "oxygen" ); 
+	glucose_i = microenvironment.find_density_index( "glucose" ); 
     std::cout << "main.cpp:  oxygen_i = " << oxygen_i << std::endl; 
     std::cout << "main.cpp:  glucose_i = " << glucose_i << std::endl; 
 	
@@ -199,34 +246,7 @@ int main( int argc, char* argv[] )
 					save_PhysiCell_to_MultiCellDS_xml_pugi( filename , microenvironment , PhysiCell_globals.current_time ); 
 				}
 
-
-                // rwh: temporarily put here, i.e., every full save interval instead of diffusion_dt
-                // // #pragma omp parallel for 
-                // for( int i=0; i < (*all_cells).size(); i++ )
-                // {
-                //     if( (*all_cells)[i]->is_out_of_domain == false )
-                //     {
-                //         // Find voxel index for this cell
-                //         int vi = microenvironment.nearest_voxel_index((*all_cells)[i]->position);
-
-                //         // Obtain substrate value(s) for this voxel and update the corresponding species in SBML
-                //         double oxy_val = microenvironment(vi)[oxygen_i];
-                //         std::cout << "main.cpp:  oxy_val = " << oxy_val << std::endl; 
-                //         retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Oxy",oxy_val);
-
-                //         double glucose_val = microenvironment(vi)[glucose_i];
-                //         std::cout << "main.cpp:  glucose_val = " << glucose_val << std::endl; 
-                //         retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Glc",glucose_val);
-
-                //         (*all_cells)[i]->phenotype.intracellular->update();  // run solver
-
-                //         // really only need to do if saving results
-                //         (*all_cells)[i]->custom_data["energy"] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Energy");
-                //     }
-                // }
-                // // std::exit(-1);
-
-
+                update_intracellular();
 				
 				PhysiCell_globals.full_output_index++; 
 				PhysiCell_globals.next_full_save_time += PhysiCell_settings.full_save_interval;
@@ -249,32 +269,7 @@ int main( int argc, char* argv[] )
 			  Custom add-ons could potentially go here. 
 			*/
 
-            // rwh: todo: optimize 
-            // If we know for certain that the intracellular updates happen at every dt_diffusion, then do it here?
-            // #pragma omp parallel for 
-	        for( int i=0; i < (*all_cells).size(); i++ )
-	        {
-		        if( (*all_cells)[i]->is_out_of_domain == false )
-		        {
-                    // Find voxel index for this cell
-                    int vi = microenvironment.nearest_voxel_index((*all_cells)[i]->position);
-
-                    // Obtain substrate value(s) for this voxel and update the corresponding species in SBML
-	                double oxy_val = microenvironment(vi)[oxygen_i];
-	                std::cout << "main.cpp:  oxy_val = " << oxy_val << std::endl; 
-		            retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Oxy",oxy_val);
-
-	                double glucose_val = microenvironment(vi)[glucose_i];
-	                std::cout << "main.cpp:  glucose_val = " << glucose_val << std::endl; 
-		            retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Glc",glucose_val);
-
-		            (*all_cells)[i]->phenotype.intracellular->update();  // run solver
-
-                    // really only need to do if saving results
-		            (*all_cells)[i]->custom_data["energy"] = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Energy");
-		        }
-	        }
-            // std::exit(-1);
+            // update_intracellular();
 
             // rwh - argh! manual motility
 	        for( int i=0; i < (*all_cells).size(); i++ )
