@@ -192,9 +192,9 @@ void setup_tissue( void )
 	// pCell = create_cell(); 
     pCell = create_cell(get_cell_definition("default")); 
 	// pCell = create_cell(cell_defaults); 
-    double xval = -300.0;
-    double yval = 200.0;
-	pCell->assign_position( xval, yval , 0.0 );
+    double xval = 50.0;
+    double yval = 0.0;
+	pCell->assign_position( -xval, yval , 0.0 );
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 
     // std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->intracellular_type << std::endl;
@@ -204,6 +204,7 @@ void setup_tissue( void )
     // std::cout << __FUNCTION__ << "------------   pheno intra get_state() retval = " << str_retval << std::endl;
 
     pCell->phenotype.intracellular = NULL;
+
     // retval = pCell->phenotype.intracellular->start();
 
     // std::cout << __FUNCTION__ << "------------   pheno intra start() retval = " << retval << std::endl;
@@ -216,14 +217,8 @@ void setup_tissue( void )
     pCell = create_cell(); 
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
     retval = pCell->phenotype.intracellular->start();
-	pCell->assign_position( xval, 0.0, 0.0 );
+	pCell->assign_position( xval, yval, 0.0 );
 
-
-    pCell = create_cell(get_cell_definition("celltype1")); 
-    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
-    std::cout << "------------   pheno intra get_state (sbml_filename) = " << pCell->phenotype.intracellular->get_state() << std::endl;
-    retval = pCell->phenotype.intracellular->start();
-	pCell->assign_position( xval, -yval, 0.0 );
 #else
 	
 	double x = 0.0; 

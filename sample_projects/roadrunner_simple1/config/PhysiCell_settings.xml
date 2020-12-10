@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-400</x_min>
-		<x_max>400</x_max>
-		<y_min>-400</y_min>
-		<y_max>400</y_max>
+		<x_min>-100</x_min>
+		<x_max>100</x_max>
+		<y_min>-100</y_min>
+		<y_max>100</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -105,7 +105,7 @@
 	</options>	
 	
 	<save>
-		<folder>out_rr1</folder> <!-- use . for root --> 
+		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
 			<interval units="min">1</interval>
