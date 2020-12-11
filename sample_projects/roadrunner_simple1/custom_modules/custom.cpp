@@ -191,10 +191,10 @@ void setup_tissue( void )
 
 	// pCell = create_cell(); 
     pCell = create_cell(get_cell_definition("default")); 
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 	// pCell = create_cell(cell_defaults); 
-    double xval = 50.0;
-    double yval = 0.0;
-	pCell->assign_position( -xval, yval , 0.0 );
+    retval = pCell->phenotype.intracellular->start();
+	pCell->assign_position( -50, -30 , 0.0 );
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 
     // std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->intracellular_type << std::endl;
@@ -203,7 +203,14 @@ void setup_tissue( void )
     // std::string str_retval = pCell->phenotype.intracellular->get_state();
     // std::cout << __FUNCTION__ << "------------   pheno intra get_state() retval = " << str_retval << std::endl;
 
+    pCell = create_cell(); 
+    // std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    // retval = pCell->phenotype.intracellular->start();
+
+    // Override (nullify) the intracellular model so that it doesn't exist.
     pCell->phenotype.intracellular = NULL;
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+	pCell->assign_position( 0, 0 , 0.0 );
 
     // retval = pCell->phenotype.intracellular->start();
 
@@ -217,7 +224,8 @@ void setup_tissue( void )
     pCell = create_cell(); 
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
     retval = pCell->phenotype.intracellular->start();
-	pCell->assign_position( xval, yval, 0.0 );
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+	pCell->assign_position( 50, 50 , 0.0 );
 
 #else
 	

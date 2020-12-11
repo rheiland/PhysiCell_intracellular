@@ -74,10 +74,10 @@
 
 <PhysiCell_settings version="devel-version">
 	<domain>
-		<x_min>-100</x_min>
-		<x_max>100</x_max>
-		<y_min>-100</y_min>
-		<y_max>100</y_max>
+		<x_min>-300</x_min>
+		<x_max>300</x_max>
+		<y_min>-300</y_min>
+		<y_max>300</y_max>
 		<z_min>-10</z_min>
 		<z_max>10</z_max>
 		<dx>20</dx>
@@ -87,7 +87,7 @@
 	</domain>
 	
 	<overall>
-		<max_time units="min">3.0</max_time> <!-- 8640 -->
+		<max_time units="min">0.5</max_time> <!-- 8640 -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
 	
@@ -108,12 +108,12 @@
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">1</interval>
+			<interval units="min">0.01</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">1</interval>
+			<interval units="min">0.01</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -168,7 +168,7 @@
 				</death>					
 				
 				<volume>  
-					<total units="micron^3">1000</total>
+					<total units="micron^3">500</total>
 					
 					<fluid_change_rate units="1/min">0.0</fluid_change_rate>
 					<cytoplasmic_biomass_change_rate units="1/min">0.0</cytoplasmic_biomass_change_rate>
