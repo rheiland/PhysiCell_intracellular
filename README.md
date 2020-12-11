@@ -8,7 +8,10 @@ PhysiCell is a flexible open source framework for building agent-based multicell
 Visit http://MathCancer.org/blog for the latest tutorials and help. 
 
 ```
+$ make roadrunner_simple1
 $ make
 $ test_rr1
-$ python plot3_energies.py output
+$ cd output
+$ cp ../scripts/anim_svg_substrate_grid_step.py .
+$ python anim_svg_substrate_grid_step.py 0 0 0 600 0 600 -300 300 -300 300 0
 ```
