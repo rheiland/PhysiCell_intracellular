@@ -111,10 +111,14 @@ void update_intracellular()
 
             // Obtain substrate value(s) for this voxel and update the corresponding species in SBML
             double oxy_val = microenvironment(vi)[oxygen_i];
-            std::cout << "main.cpp:  oxy_val = " << oxy_val << std::endl; 
+            std::cout << "main.cpp:  oxy_val (from substrate)= " << oxy_val << std::endl; 
             retval = (*all_cells)[i]->phenotype.intracellular->set_parameter_value("Oxy",oxy_val);
 
             (*all_cells)[i]->phenotype.intracellular->update();  // run solver
+
+            oxy_val = (*all_cells)[i]->phenotype.intracellular->get_parameter_value("Oxy");
+            std::cout << "main.cpp:  oxy_val (from intracellular) = " << oxy_val << std::endl; 
+            microenvironment(vi)[oxygen_i] = oxy_val;
           }
         }
     }
