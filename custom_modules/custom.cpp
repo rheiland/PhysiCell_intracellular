@@ -85,23 +85,6 @@ void create_cell_types( void )
 	   This is a good place to set default functions. 
 	*/ 
 	
-    std::cout << "custom.cpp: 1" << std::endl;
-	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	// cell_defaults.functions.update_velocity = NULL;
-
-    std::cout << "custom.cpp: 2" << std::endl;
-	// cell_defaults.functions.update_migration_bias = NULL; 
-	// cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; 
-	// cell_defaults.functions.update_phenotype = NULL; 
-	// cell_defaults.functions.custom_cell_rule = NULL; 
-	
-    std::cout << "custom.cpp: 3" << std::endl;
-	// cell_defaults.functions.add_cell_basement_membrane_interactions = NULL; 
-	// cell_defaults.functions.calculate_distance_to_membrane = NULL; 
-	
-    std::cout << "custom.cpp: 4" << std::endl;
-	// cell_defaults.custom_data.add_variable(parameters.strings("node_to_visualize"), "dimensionless", 0.0 ); //for paraview visualization
-
 	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
@@ -123,13 +106,6 @@ void create_cell_types( void )
 	build_cell_definitions_maps(); 
     std::cout << "custom.cpp: after build_cell_definitions_maps() " << std::endl;
 
-    // rwh - why aren't the cells motile??!
-    cell_defaults.phenotype.motility.is_motile = true;
-	cell_defaults.phenotype.motility.persistence_time = 0.0;  // parameters.doubles("persistence_time"); 
-	cell_defaults.phenotype.motility.migration_speed = 100.;  // parameters.doubles("migration_speed"); 
-	cell_defaults.phenotype.motility.migration_bias_direction = { 1.0, 0.0, 0.0 };  
-	cell_defaults.phenotype.motility.migration_bias = 0.5;  // parameters.doubles("migration_bias"); 
-	
 	display_cell_definitions( std::cout ); 
     std::cout << "custom.cpp: after display_cell_definitions() " << std::endl;
 	
@@ -215,10 +191,10 @@ void setup_tissue( void )
 
 	// pCell = create_cell(); 
     pCell = create_cell(get_cell_definition("default")); 
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 	// pCell = create_cell(cell_defaults); 
-    double xval = -300.0;
-    double yval = 200.0;
-	pCell->assign_position( xval, yval , 0.0 );
+    retval = pCell->phenotype.intracellular->start();
+	pCell->assign_position( -50, -30 , 0.0 );
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
 
     // std::cout << __FUNCTION__ << "------------   pheno intra type = " << pCell->phenotype.intracellular->intracellular_type << std::endl;
@@ -227,7 +203,15 @@ void setup_tissue( void )
     // std::string str_retval = pCell->phenotype.intracellular->get_state();
     // std::cout << __FUNCTION__ << "------------   pheno intra get_state() retval = " << str_retval << std::endl;
 
+    pCell = create_cell(); 
+    // std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+    // retval = pCell->phenotype.intracellular->start();
+
+    // Override (nullify) the intracellular model so that it doesn't exist.
     pCell->phenotype.intracellular = NULL;
+    std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
+	pCell->assign_position( 0, 0 , 0.0 );
+
     // retval = pCell->phenotype.intracellular->start();
 
     // std::cout << __FUNCTION__ << "------------   pheno intra start() retval = " << retval << std::endl;
@@ -240,14 +224,9 @@ void setup_tissue( void )
     pCell = create_cell(); 
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
     retval = pCell->phenotype.intracellular->start();
-	pCell->assign_position( xval, 0.0, 0.0 );
-
-
-    pCell = create_cell(get_cell_definition("celltype1")); 
     std::cout << __FUNCTION__ << ": cell ID= " << pCell->ID <<": ------------   pheno intra = " << pCell->phenotype.intracellular << std::endl;
-    std::cout << "------------   pheno intra get_state (sbml_filename) = " << pCell->phenotype.intracellular->get_state() << std::endl;
-    retval = pCell->phenotype.intracellular->start();
-	pCell->assign_position( xval, -yval, 0.0 );
+	pCell->assign_position( 50, 50 , 0.0 );
+
 #else
 	
 	double x = 0.0; 
