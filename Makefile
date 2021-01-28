@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := test_rr1
+PROGRAM_NAME := project
 
 CC := g++
 
@@ -9,112 +9,272 @@ ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
 
-# override with clang++ due to libRoadrunner macOS version relying on it
-#CC := clang++
+ARCH := native # best auto-tuning
 
-ARCH := native # best auto-tuning 
+# CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 
-# CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_ROADRUNNER
-# CFLAGS := -march=$(ARCH) -fomit-frame-pointer -Xpreprocessor -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-
-# OSX
-#PATH_TO_OMP := -L/usr/local/opt/libomp/lib
-#OMP_LIB := $(PATH_TO_OMP) -lomp
-
-#LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m
-#LIBRR_LIBS := /home/heiland/libroadrunner/cpplibroadrunner-1.3.0-linux_x86_64/lib
-
-OSFLAG 	:=
-ifeq ($(OS),Windows_NT)
-	OSFLAG += -D WIN32
-	OMP_LIB := 
-	LIBRR_DIR := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m
-	LIBRR_LIBS := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m/bin
-	LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
-	CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_ROADRUNNER 
-	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-		OSFLAG += -D AMD64
-	endif
-	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-		OSFLAG += -D IA32
-	endif
-else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		OSFLAG += -D LINUX
-		OMP_LIB :=
-		LIBRR_DIR := $(HOME)/libroadrunner/libroadrunner
-		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
-		LIBRR_LIBS := ${LIBRR_DIR}/lib
-		# CFLAGS := -march=$(ARCH) -g  -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -m64 -std=c++11 -D ADDON_ROADRUNNER 
-	endif
-	ifeq ($(UNAME_S),Darwin)
-#		CC := clang++
-		OSFLAG += -D OSX
-		LIBRR_DIR := $(HOME)/libroadrunner/roadrunner-osx-10.9-cp36m
-		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
-		LIBRR_LIBS := ${LIBRR_DIR}/lib
-	endif
-		UNAME_P := $(shell uname -p)
-	ifeq ($(UNAME_P),x86_64)
-		OSFLAG += -D AMD64
-		LIBRR_DIR := $(HOME)/libroadrunner/libroadrunner
-		LIBRR_CFLAGS := -I${LIBRR_DIR}/include/rr/C
-		# CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D LIBROADRUNNER 
-		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_ROADRUNNER 
-	endif
-		ifneq ($(filter %86,$(UNAME_P)),)
-	OSFLAG += -D IA32
-		endif
-	ifneq ($(filter arm%,$(UNAME_P)),)
-		OSFLAG += -D ARM
-	endif
-endif
-
-#COMPILE_COMMAND := $(CC) $(CFLAGS) 
-COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBRR_CFLAGS) 
+COMPILE_COMMAND := $(CC) $(CFLAGS) 
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
-PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o 
+PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-#PhysiCell_custom_module_OBJECTS := custom.o submodel_data_structures.o internal_viral_dynamics.o internal_viral_response.o receptor_dynamics.o immune_submodels.o epithelium_submodel.o
-PhysiCell_custom_module_OBJECTS := custom.o 
+PhysiCell_custom_module_OBJECTS := .o
 
 pugixml_OBJECTS := pugixml.o
 
-# PhysiBoSSa_OBJECTS := maboss_network.o maboss_intracellular.o
-ROADRUNNER_OBJECTS := librr_intracellular.o 
-
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(ROADRUNNER_OBJECTS)
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
-# compile the project 
+EXAMPLES := ./examples/PhysiCell_test_mechanics_1.cpp ./examples/PhysiCell_test_mechanics_2.cpp \
+ ./examples/PhysiCell_test_DCIS.cpp ./examples/PhysiCell_test_HDS.cpp \
+ ./examples/PhysiCell_test_cell_cycle.cpp ./examples/PhysiCell_test_volume.cpp 
 
-#all: main.cpp $(ALL_OBJECTS)
-#	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp 
+all: 
+	make heterogeneity-sample
+	make 
 
-all: main.cpp $(ALL_OBJECTS)
-	@echo Your OS= $(OSFLAG)
-	@echo LIBRR_CFLAGS= $(LIBRR_CFLAGS)
-	@echo LIBRR_LIBS= $(LIBRR_LIBS)
-	@echo 
-#	$(COMPILE_COMMAND) -L$(LIBRR_LIBS) -lroadrunner_c_api $(PATH_TO_OMP) -lomp -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp
-#	$(COMPILE_COMMAND) -L$(LIBRR_LIBS) -lroadrunner_c_api $(OMP_LIB) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp
-	$(COMPILE_COMMAND) $(OMP_LIB) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp -L$(LIBRR_LIBS) -lroadrunner_c_api
-	@echo
-	@echo created $(PROGRAM_NAME)
-	@echo
+# sample projects 	
+list-projects:
+	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template spheroid-TNF drug-AGS ecm-try"
+	@echo "                 arnau-model sorting physiboss-cell-lines"
+	
+template2D: 
+	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template2D/main-2D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template2D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template2D/config/* ./config/
+	
+template3D: 	
+	cp ./sample_projects/template3D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template3D/main-3D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template3D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template3D/config/* ./config/
+	
+template:
+	cp ./sample_projects/template/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template/config/* ./config/
+	
+# sample projects 
 
+biorobots-sample:
+	cp ./sample_projects/biorobots/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/biorobots/main-biorobots.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/biorobots/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/biorobots/config/* ./config/
+	
+cancer-biorobots-sample:
+	cp ./sample_projects/cancer_biorobots/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/cancer_biorobots/main-cancer_biorobots.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/cancer_biorobots/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/cancer_biorobots/config/* ./config/
+	
+heterogeneity-sample:
+	cp ./sample_projects/heterogeneity/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/heterogeneity/main-heterogeneity.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/heterogeneity/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/heterogeneity/config/* ./config/
+	
+cancer-immune-sample:
+	cp ./sample_projects/cancer_immune/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/cancer_immune/main-cancer_immune_3D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/cancer_immune/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/cancer_immune/config/* ./config/
+	
+virus-macrophage-sample:
+	cp ./sample_projects/virus_macrophage/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/virus_macrophage/main-virus_macrophage.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/virus_macrophage/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/virus_macrophage/config/* ./config/
+	
+beta-testing:
+	cp ./sample_projects/beta_testing/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/beta_testing/main-beta.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/beta_testing/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/beta_testing/config/* ./config/
+
+spheroid-TNF: 	
+	cp ./sample_projects/spheroid_TNF/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/spheroid_TNF/main-spheroid_TNF.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/spheroid_TNF/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/spheroid_TNF/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/spheroid_TNF/scripts/* ./scripts/
+
+spheroid-TNF-v2: 	
+	cp ./sample_projects/spheroid_TNF_v2/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/spheroid_TNF_v2/main-spheroid_TNF.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/spheroid_TNF_v2/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/spheroid_TNF_v2/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/spheroid_TNF_v2/scripts/* ./scripts/
+	
+ecm-try: 	
+	cp -r ./sample_projects/ECM_try/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/ECM_try/main_ECM_try.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/ECM_try/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/ECM_try/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/ECM_try/scripts/* ./scripts/
+
+arnau-model: 	
+	cp -r ./sample_projects/Arnau_model/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/Arnau_model/main_arnau_model.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/Arnau_model/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/Arnau_model/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/Arnau_model/scripts/* ./scripts/
+
+sorting: 	
+	cp -r ./sample_projects/sorting/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/sorting/main_sorting.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/sorting/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/sorting/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/sorting/scripts/* ./scripts/
+
+physiboss-cell-lines:
+	cp -r ./sample_projects/physiboss_cell_lines/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/physiboss_cell_lines/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/physiboss_cell_lines/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/physiboss_cell_lines/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/physiboss_cell_lines/scripts/* ./scripts/
+
+covid19:
+	cp -r ./sample_projects/covid19/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/covid19/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/covid19/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/covid19/config/* ./config/
+	mkdir -p ./scripts/
+	cp ./sample_projects/covid19/scripts/* ./scripts/
+
+mycovid19:
+	cp -r ./sample_projects/mycovid19/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/mycovid19/main.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/mycovid19/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/mycovid19/config/* ./config/
+	mkdir -p ./scripts/
+	cp ./sample_projects/mycovid19/scripts/* ./scripts/
+
+drug-AGS: 	
+	cp ./sample_projects/drug_AGS/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/drug_AGS/main-drug_AGS.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/drug_AGS/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp -r ./sample_projects/drug_AGS/config/* ./config/
+	mkdir ./scripts/
+	cp ./sample_projects/drug_AGS/scripts/* ./scripts/
+
+test_sbml1:
+	cp ./sample_projects/test_sbml1/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/test_sbml1/main-test_sbml1.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/test_sbml1/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/test_sbml1/config/* ./config/
+
+roadrunner_simple1:
+	cp ./sample_projects/roadrunner_simple1/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/roadrunner_simple1/main_roadrunner_simple1.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/roadrunner_simple1/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/roadrunner_simple1/config/* ./config/
+	
+# early examples for convergence testing 
+
+physicell_test_mech1: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp 
+	$(COMPILE_COMMAND) -o test_mech1 $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_1.cpp
+
+physicell_test_mech2: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_2.cpp 
+	$(COMPILE_COMMAND) -o test_mech2 $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_mechanics_2.cpp
+	
+physicell_test_DCIS: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp 
+	$(COMPILE_COMMAND) -o test_DCIS $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp
+
+physicell_test_HDS: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_HDS.cpp 
+	$(COMPILE_COMMAND) -o test_HDS $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_HDS.cpp
+
+physicell_test_cell_cycle: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp 
+	$(COMPILE_COMMAND) -o test_cycle $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp
+
+PhysiCell_test_volume: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_volume.cpp 
+	$(COMPILE_COMMAND) -o test_volume $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_volume.cpp
+	
+examples: $(PhysiCell_OBJECTS) 
+	$(COMPILE_COMMAND) -o ./examples/test_mech1 ./examples/PhysiCell_test_mechanics_1.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_mech2 ./examples/PhysiCell_test_mechanics_2.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_DCIS ./examples/PhysiCell_test_DCIS.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_HDS ./examples/PhysiCell_test_HDS.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_cycle ./examples/PhysiCell_test_cell_cycle.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_volume ./examples/PhysiCell_test_volume.cpp $(PhysiCell_OBJECTS)
 
 # PhysiCell core components	
 
@@ -187,23 +347,25 @@ PhysiCell_MultiCellDS.o: ./modules/PhysiCell_MultiCellDS.cpp
 
 PhysiCell_various_outputs.o: ./modules/PhysiCell_various_outputs.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_various_outputs.cpp
-
+	
 PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_pugixml.cpp
 	
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp	
 	
 # user-defined PhysiCell modules
 
-custom.o: ./custom_modules/custom.cpp ./intracellular/PhysiCell_intracellular.h
-	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
-
-librr_intracellular.o: ./addons/libRoadrunner/src/librr_intracellular.cpp ./addons/libRoadrunner/src/librr_intracellular.h
-	$(COMPILE_COMMAND) -c ./addons/libRoadrunner/src/librr_intracellular.cpp
-
-
 # cleanup
+
+reset:
+	rm -f *.cpp 
+	cp ./sample_projects/Makefile-default Makefile 
+	rm -fr ./custom_modules/*
+	touch ./custom_modules/empty.txt 
+	touch ALL_CITATIONS.txt 
+	rm ALL_CITATIONS.txt 
+	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	
 clean:
 	rm -f *.o
@@ -216,19 +378,9 @@ data-cleanup:
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-
-reset:
-	cp ./config/PhysiCell_settings.xml-default ./config/PhysiCell_settings.xml 
 	
-FOLDER := output
-FRAMERATE := 24
-movie:
-#	mencoder "mf://snapshot*.jpg" -ovc lavc -lavcopts vcodec=mpeg4:vbitrate=10000:mbd=2:trell -mf fps=$(FRAMERATE):type=jpg -nosound -o out.avi	
-#	ffmpeg -i out.avi out.mp4 
-	ffmpeg -r $(FRAMERATE) -f image2 -i snapshot%08d.jpg -vcodec libx264 -pix_fmt yuv420p -strict -2 -tune animation -crf 15 -acodec aac out.mp4
-	#del snap*.jpg
 # archival 
-	
+
 checkpoint: 
 	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
 	

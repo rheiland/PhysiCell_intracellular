@@ -2,32 +2,14 @@ VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
 PROGRAM_NAME := project
 
 CC := g++
-# CC := g++-mp-7 # typical macports compiler name
-# CC := g++-7 # typical homebrew compiler name 
 
 # Check for environment definitions of compiler 
-# e.g., on CC = g++-7 on OSX
+# e.g., on CC = g++-10 on OSX
 ifdef PHYSICELL_CPP 
 	CC := $(PHYSICELL_CPP)
 endif
 
 ARCH := native # best auto-tuning
-# ARCH := core2 # a reasonably safe default for most CPUs since 2007
-# ARCH := corei7
-# ARCH := corei7-avx # earlier i7 
-# ARCH := core-avx-i # i7 ivy bridge or newer 
-# ARCH := core-avx2 # i7 with Haswell or newer
-# ARCH := nehalem
-# ARCH := westmere
-# ARCH := sandybridge # circa 2011
-# ARCH := ivybridge   # circa 2012
-# ARCH := haswell     # circa 2013
-# ARCH := broadwell   # circa 2014
-# ARCH := skylake     # circa 2015
-# ARCH := bonnell
-# ARCH := silvermont
-# ARCH := skylake-avx512
-# ARCH := nocona #64-bit pentium 4 or later 
 
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
@@ -256,6 +238,15 @@ test_sbml1:
 	cp ./sample_projects/test_sbml1/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/test_sbml1/config/* ./config/
+
+roadrunner_simple1:
+	cp ./sample_projects/roadrunner_simple1/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/roadrunner_simple1/main_roadrunner_simple1.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/roadrunner_simple1/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/roadrunner_simple1/config/* ./config/
 	
 # early examples for convergence testing 
 
