@@ -7,6 +7,14 @@ PhysiCell is a flexible open source framework for building agent-based multicell
 
 Visit http://MathCancer.org/blog for the latest tutorials and help. 
 
+## Intracellular demo model with libRoadrunner
+
+Before you begin, you need to install the (binary) libRoadrunner. In the `/beta` directory, 
+run `python setup_libroadrunner.py` and follow its instructions. We recommend
+installing the (free) Anaconda Python distribution from https://www.anaconda.com/products/individual.
+
+Next, try to run the following commands from a command line window.
+
 ```
 $ make roadrunner_simple1
 $ make
