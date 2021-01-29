@@ -176,7 +176,6 @@ void setup_tissue( void )
 	double cell_radius = cell_defaults.phenotype.geometry.radius; 
 	double cell_spacing = 0.95 * 2.0 * cell_radius; 
 	
-	double tumor_radius = parameters.doubles("tumor_radius"); // 200.0; 
 	
 	Cell* pCell = NULL; 
 
@@ -229,6 +228,7 @@ void setup_tissue( void )
 
 #else
 	
+	double tumor_radius = parameters.doubles("tumor_radius"); // 200.0; 
 	double x = 0.0; 
 	double x_outer = tumor_radius; 
 	double y = 0.0; 
