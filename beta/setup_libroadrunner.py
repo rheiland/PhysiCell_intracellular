@@ -88,8 +88,12 @@ def download_cb(blocknum, blocksize, totalsize):
             sys.stderr.write("\n")
     else: # total size is unknown
         sys.stderr.write("read %d\n" % (readsofar,))
-
-urllib.request.urlretrieve(url, my_file, download_cb)
+try:
+    urllib.request.urlretrieve(url, my_file, download_cb)
+except Exception:
+    print('------- got a urllib exception')
+#    print str(e)
+    traceback.print_exc()
 
 os.chdir(dir_name)
 print('installing (uncompressing) the file...')
@@ -112,10 +116,34 @@ else:  # Darwin or Linux
 print('Done.\n')
 
 # LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m
-print("Replace the following variables in your PhysiCell Makefile with these:\n")
+
+#----------------------------------
+print("Do the following 2 steps:")
+print("1) Replace the following variables in your PhysiCell Makefile with these:\n")
 #print("LIBRR_DIR := /Users/heiland/libroadrunner/roadrunner-osx-10.9-cp36m")
 print("LIBRR_DIR := " + rrlib_dir)
-if os_type == 'Windows':
+
+#if os_type == 'Windows':
+if os_type.lower().startswith("win"):
     print("LIBRR_LIBS := " + rrlib_dir + "/bin\n")
 else:
     print("LIBRR_LIBS := " + rrlib_dir + "/lib\n")
+
+
+win_lib_path = rrlib_dir + "/bin"
+unix_lib_path = rrlib_dir + "/lib"
+
+print()
+more_info = ("2) follow instructions for your particular operating system to permanently\n"
+"append this path to the appropriate environment variable. e.g.,")
+print(more_info)
+
+if os_type.lower().startswith("win"):
+    print("add " + win_lib_path + " to your PATH env variable.")
+else:
+    unix_info = ("macOS:\n"
+                 "export DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:" + unix_lib_path + "\n\n"
+                 "Linux:\n"
+                 "export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:" + unix_lib_path + "\n")
+    print(unix_info)
+
