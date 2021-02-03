@@ -204,6 +204,15 @@ librr_intracellular.o: ./addons/libRoadrunner/src/librr_intracellular.cpp ./addo
 
 
 # cleanup
+
+reset:
+	rm -f *.cpp 
+	cp ./sample_projects/Makefile-default Makefile 
+	rm -f ./custom_modules/*
+	touch ./custom_modules/empty.txt 
+	touch ALL_CITATIONS.txt 
+	rm ALL_CITATIONS.txt 
+	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	
 clean:
 	rm -f *.o
@@ -216,9 +225,6 @@ data-cleanup:
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-
-reset:
-	cp ./config/PhysiCell_settings.xml-default ./config/PhysiCell_settings.xml 
 	
 FOLDER := output
 FRAMERATE := 24
