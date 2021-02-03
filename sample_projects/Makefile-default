@@ -256,6 +256,15 @@ test_sbml1:
 	cp ./sample_projects/test_sbml1/Makefile .
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
 	cp ./sample_projects/test_sbml1/config/* ./config/
+
+roadrunner_simple1:
+	cp ./sample_projects/roadrunner_simple1/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/roadrunner_simple1/main_roadrunner_simple1.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/roadrunner_simple1/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/roadrunner_simple1/config/* ./config/
 	
 # early examples for convergence testing 
 
